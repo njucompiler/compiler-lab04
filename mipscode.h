@@ -52,6 +52,7 @@ Operand_M new_operand_M(int kind,int value);
 //Operand_M new_operand_name(char* name);
 Operand_M new_label_M();
 //Operand_M new_temp();
-Operand_M new_reg(no)
+Operand_M new_reg(no);
+Operand_M new_addr(int no, int offset);
 
 #endif
