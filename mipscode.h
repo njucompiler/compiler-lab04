@@ -7,25 +7,24 @@ typedef struct MipsCodes_* MipsCodes;
 
 typedef struct Operand_M_ {
 	enum {  MIP_CONSTANT, MIP_LABEL, MIP_FUNC_op, MIP_ADDR_op, MIP_REG} kind;
-	int is_min;
 	union {
-	char op[3];//==,<=,>=,!=,>,<
-	char name[20];
-	int reg_no;
-	int var_no;
-	int value;
-	int label_no;
-	char func[20];
-	char param[20];
-	struct addr_{
+	//char op[3];//==,<=,>=,!=,>,<
 		int reg_no;
-		int offset;
-	}addr
+		int value;
+		int label_no;
+		char func[20];
+		struct addr_{
+			int reg_no;
+			int offset;
+		}addr
 	} ;
 }Operand_M_;
+
 typedef struct MipsCode_
 {
-	enum { MIP_ASSIGN, MIP_ADD, MIP_SUB, MIP_MUL, MIP_DIVI, MIP_LAB, MIP_GOTO, MIP_RET, MIP_ADDR, MIP_COND,MIP_FUNC_I,MIP_DEC,MIP_READ,MIP_WRITE,MIP_CALL,MIP_ARG,MIP_PARAM_I} kind;
+	enum { MIPS_LABEL, MIPS_LI, MIPS_LA, MIPS_MOVE, MIPS_ADDI, MIPS_ADD, MIPS_SUB, MIPS_MUL, MIPS_DIV, 
+			MIPS_MFLO, MIPS_LW, MIPS_SW, MIPS_J, MIPS_JAL, MIPS_JR, MIPS_BEQ, MIPS_BNE, MIPS_BGT, MIPS_BLT,
+			MIPS_BGE, MIPS_BLE} kind;
 	union {
 		struct { Operand_M right, left; } assign;
 		struct { Operand_M result, op1, op2; } binop;
