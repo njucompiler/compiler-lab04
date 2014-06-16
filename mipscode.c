@@ -1,3 +1,5 @@
+#include "mipscode.h"
+
 MipsCodes MipsCodes_init(){
 	MipsCodes temp = (MipsCodes)malloc(sizeof(MipsCodes_));
 	temp->prev = NULL;
@@ -56,10 +58,11 @@ void translate_MipsCodes(InterCodes IC_head){
 	Mips_head = q;
 }
 MipsCode translate_MipsCode(InterCode IC_code){
-	MipsCode temp = new_MipsCode();
+	//MipsCode temp = new_MipsCode();
 	Operand_M opm1 = NULL,opm2 = NULL,opm3 = NULL;
 	switch(IC_code){
 		case ASSIGN:
+			MipsCode temp = new_MipsCode(MIP_ASSIGN);
 			if(IC_code->assign.right->kind == CONSTANT){
 				temp->assign.left->kind = MIP_CONSTANT;
 				opm1 = new_Operand_M(0,IC_code->assign.right->value);
@@ -77,6 +80,8 @@ MipsCode translate_MipsCode(InterCode IC_code){
 		case DIVI:
 			break;
 		case LAB:
+			MipsCode temp = new_MipsCode(MIP_LAB);
+			temp->onlyop.op = new_Operand_M(MIP_LABEL,IC_code->onlyop.op->label_no);
 			break;
 		case RET:
 			break;
@@ -102,4 +107,5 @@ MipsCode translate_MipsCode(InterCode IC_code){
 			break;
 
 	}
+	return temp;
 }
