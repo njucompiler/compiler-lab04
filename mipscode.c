@@ -44,6 +44,12 @@ Operand_M new_operand_M(int kind,int value){
 		op->label_no = value;
 	return op;
 }
+Operand_M new_reg(no){
+	Operand_M op = (Operand_M)malloc(sizeof(Operand_M_));
+	op->kind = MIP_REG;
+	op->reg_no = no;
+	return op;
+}
 void translate_MipsCodes(InterCodes IC_head){
 	InterCodes p = IC_head;
 	MipsCodes q;
@@ -55,18 +61,35 @@ void translate_MipsCodes(InterCodes IC_head){
 	}
 	Mips_head = q;
 }
+void get_reg(){
+}
+void release_reg(){
+}
+
 MipsCode translate_MipsCode(InterCode IC_code){
 	MipsCode temp = new_MipsCode();
 	Operand_M opm1 = NULL,opm2 = NULL,opm3 = NULL;
+	int reg_no;
 	switch(IC_code){
 		case ASSIGN:
 			if(IC_code->assign.right->kind == CONSTANT){
 				temp->assign.left->kind = MIP_CONSTANT;
 				opm1 = new_Operand_M(0,IC_code->assign.right->value);
-				opm2 = new_Operand_M();
-				temp->MIP_ASSIGN.right = opm1;
-				temp->MIP_ASSIGN.left = opm2;
+				reg_no = get_reg();
+				opm2 = new_reg(reg_no);
+				temp->assign.right = opm1;
+				temp->assign.left = opm2;
 			}
+			else if(IC_code->assign.right->kind == VARIABLE || IC_code->assign.right->kind == TEMP){
+				reg_no = get_reg();
+				opm1 = new_reg(reg_no);
+				reg_no = get_reg();
+				opm2 = new_reg(reg_no);
+				temp->assign.right = opm1;
+				temp->assign.left = opm2;
+				temp->assign.kind = MIP_MOVE;
+			}
+			else if(IC_code->assign.right->kind == ADDR_op)
 			break;
 		case ADD:
 			break;
