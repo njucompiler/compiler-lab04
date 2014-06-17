@@ -4,6 +4,7 @@
 typedef struct Operand_M_* Operand_M;
 typedef struct MipsCode_* MipsCode;
 typedef struct MipsCodes_* MipsCodes;
+typedef struct RegTable_* RegTable;
 
 typedef struct Operand_M_ {
 	enum {  MIP_CONSTANT, MIP_LABEL, MIP_FUNC_op, MIP_ADDR_op, MIP_REG} kind;
@@ -40,6 +41,15 @@ typedef struct MipsCodes_
 }MipsCodes_;
 
 MipsCodes Mips_head;
+
+typedef struct RegTable_
+{
+	enum{NO_USE, REG_INT, REG_NAME} kind;
+	union{
+		int value;
+		char name[20];
+	}
+}RegTable_;
 
 static char* reg[32] = {"$zero", "Sat", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7" "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$s8", "Sra"};
 void translate_MipsCodes(InterCodes IC_head);

@@ -1,4 +1,19 @@
 #include "mipscode.h"
+#include <string.h>
+#include <assert.h>
+
+#define REG_TABLE_SIZE 8
+
+RegTable regtable[REG_TABLE_SIZE];
+
+void regtable_init(){
+	int i;
+	assert(regtable);
+	for(i = 0; i < REG_TABLE_SIZE; i++){
+		regtable[i] = (RegTable)malloc(sizeof(RegTable_));
+		regtable[i]->kind = NO_USE;
+	}
+}
 
 MipsCodes MipsCodes_init(){
 	MipsCodes temp = (MipsCodes)malloc(sizeof(MipsCodes_));
@@ -70,9 +85,56 @@ void translate_MipsCodes(InterCodes IC_head){
 	}
 	Mips_head = q;
 }
-void get_reg(){
+int get_reg(int cst){
+	int i,j = 0;
+	for(i = 0; i < REG_TABLE_SIZE; i++){
+		if(regtable[i]->kind == REG_INT){
+			if(regtable[i]->value == cst){
+				return i;
+			}
+		}
+		else if(regtable[i]->kind == NO_USE){
+			j = i;
+		}
+	}
+	if(j == 0){
+		free(regtable[0]);
+		regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
+		regtable[0]->kind = REG_INT;
+		regtable[0]->value = cst;
+		return 0; 
+	}
+	else{
+		regtable[i]->kind = REG_INT;
+		regtable[i]->value = cst;
+		return j;
+	}
 }
-void release_reg(){
+
+int get_reg(char* name){
+	int i,j = 0;
+	for(i = 0; i < REG_TABLE_SIZE; i++){
+		if(regtable[i]->kind == REG_NAME){
+			if(strcmp(regtable[i]->name ,name) == 0){
+				return i;
+			}
+		}
+		else if(regtable[i]->kind == NO_USE){
+			j = i;
+		}
+	}
+	if(j == 0){
+		free(regtable[0]);
+		regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
+		regtable[0]->kind = REG_NAME;
+		strcpy(regtable[0]->name, name);
+		return 0; 
+	}
+	else{
+		regtable[j]->kind = REG_NAME;
+		strcpy(regtable[j]->name, name);
+		return j;
+	}
 }
 
 MipsCode translate_MipsCode(InterCode IC_code){
