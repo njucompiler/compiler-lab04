@@ -75,7 +75,8 @@ void get_reg(){
 void release_reg(){
 }
 
-MipsCode translate_MipsCode(InterCode IC_code){
+MipsCode translate_MipsCode(InterCodes IC_codes){
+	InterCode IC_code = IC_codes->code;
 	//MipsCode temp = new_MipsCode();
 	Operand_M opm1 = NULL,opm2 = NULL,opm3 = NULL;
 	MipsCodes head = NULL;
@@ -528,7 +529,7 @@ MipsCode translate_MipsCode(InterCode IC_code){
 				MipsCodes_link(head,tem);
 			}
 			//x:=*y/z
-			if(IC_code->binop.op1->kind == CONSTANT){		// temp:=*y
+			if(IC_code->binop.op1->kind == ADDR_op){		// temp:=*y
 				reg_no = get_reg();
 				opm2 = new_addr(reg_no,0);
 				reg_no = get_reg();
@@ -541,7 +542,7 @@ MipsCode translate_MipsCode(InterCode IC_code){
 				MipsCodes_link(head,tem);
 			}
 			//x:=y/*z
-			if(IC_code->binop.op2->kind == CONSTANT){		// temp:=*z
+			if(IC_code->binop.op2->kind == ADDR_op){		// temp:=*z
 				reg_no = get_reg();
 				opm3 = new_addr(reg_no,0);
 				reg_no = get_reg();
@@ -585,6 +586,66 @@ MipsCode translate_MipsCode(InterCode IC_code){
 		case ADDR:
 			break;
 		case COND:
+			/*if(IC_code->cond.op1->kind == CONSTANT){		// temp:=*y
+				reg_no = get_reg();
+				opm2 = new_addr(reg_no,0);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LW);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm2;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			if(IC_code->cond.op2->kind == CONSTANT){		// temp:=*x
+				reg_no = get_reg();
+				opm3 = new_addr(reg_no,0);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LW);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm3;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}*/
+			MipsCodes tem = MipsCodes_init();
+			MipsCode temp = NULL;
+			//if x==y GOTO z
+			if(strcmp(IC_code->cond.op->op,"==") == 0){
+				temp = new_MipsCode(MIP_BEQ);
+			}
+			//if x!=y GOTO z
+			if(strcmp(IC_code->cond.op->op,"!=") == 0){
+				temp = new_MipsCode(MIP_BEQ);
+			}
+			//if x>y GOTO z
+			if(strcmp(IC_code->cond.op->op,">") == 0){
+				temp = new_MipsCode(MIP_BEQ);
+			}
+			//if x<y GOTO z
+			if(strcmp(IC_code->cond.op->op,"<") == 0){
+				temp = new_MipsCode(MIP_BEQ);
+			}
+			//if x>=y GOTO z
+			if(strcmp(IC_code->cond.op->op,">=") == 0){
+				temp = new_MipsCode(MIP_BEQ);
+			}
+			//if x<=y GOTO z
+			if(strcmp(IC_code->cond.op->op,"<=") == 0){
+				temp = new_MipsCode(MIP_BEQ);
+			}
+			reg_no = get_reg();
+			Operand_M opm1 = new_reg(reg_no);
+			reg_no = get_reg();
+			Operand_M opm2 = new_reg(reg_no);
+			temp->binop.result = opm1;
+			temp->binop.op1 = opm2;
+			opm3 = new_Operand_M(MIP_LABEL,IC_codes->next->code->onlyop.op->label_no);
+			temp->binop.op2 = opm3;
+			tem->code = temp;
+			MipsCodes_link(head,tem);
 			break;
 		case FUNC_I:
 			break;
