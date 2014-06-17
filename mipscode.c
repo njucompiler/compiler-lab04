@@ -439,15 +439,132 @@ MipsCode translate_MipsCode(InterCode IC_code){
 			//x:=#k+#k
 			break;
 		case MUL:
+			reg_no = get_reg();
+			opm1 = new_reg(reg_no);
 			//x:= y * #k
 			if(IC_code->binop.op2->kind == CONSTANT){
+				opm3 = new_Operand_M(0,IC_code->binop.op2->value);
 				reg_no = get_reg();
-				opm2 = new_Operand_M(0,IC_code->binop.op2->value);
-				
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LI);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm3;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
 			}
 			//x:= #k * y
+			if(IC_code->binop.op1->kind == CONSTANT){
+				opm2 = new_Operand_M(0,IC_code->binop.op1->value);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LI);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm2;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:=*y*z
+			if(IC_code->binop.op1->kind == CONSTANT){		// temp:=*y
+				reg_no = get_reg();
+				opm2 = new_addr(reg_no,0);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LW);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm2;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:=y**z
+			if(IC_code->binop.op2->kind == CONSTANT){		// temp:=*z
+				reg_no = get_reg();
+				opm3 = new_addr(reg_no,0);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LW);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm3;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:=y*z
+			MipsCodes tem1 = MipsCodes_init();
+			MipsCode temp1 = new_MipsCode(MIP_MUL);
+			temp1->binop.result = opm1;
+			temp1->binop.op1 = opm2;
+			temp1->binop.op2 = opm3;
+			tem1->code = temp1
+			MipsCodes_link(head,tem1);
 			break;
 		case DIVI:
+			reg_no = get_reg();
+			opm1 = new_reg(reg_no);
+			//x:= y / #k
+			if(IC_code->binop.op2->kind == CONSTANT){
+				opm3 = new_Operand_M(0,IC_code->binop.op2->value);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LI);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm3;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:= #k / y
+			if(IC_code->binop.op1->kind == CONSTANT){
+				opm2 = new_Operand_M(0,IC_code->binop.op1->value);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LI);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm2;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:=*y/z
+			if(IC_code->binop.op1->kind == CONSTANT){		// temp:=*y
+				reg_no = get_reg();
+				opm2 = new_addr(reg_no,0);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LW);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm2;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:=y/*z
+			if(IC_code->binop.op2->kind == CONSTANT){		// temp:=*z
+				reg_no = get_reg();
+				opm3 = new_addr(reg_no,0);
+				reg_no = get_reg();
+				Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem = MipsCodes_init();
+				MipsCode temp = new_MipsCode(MIP_LW);
+				temp->assign.left = opm_tem;
+				temp->assign.right = opm3;
+				tem->code = temp;
+				MipsCodes_link(head,tem);
+			}
+			//x:=y/z
+			MipsCodes tem1 = MipsCodes_init();
+			MipsCode temp1 = new_MipsCode(MIP_DIV);
+			temp1->assign.left = opm2;
+			temp1->assign.right = opm3;
+			tem1->code = temp1
+			MipsCodes_link(head,tem1);
+			MipsCodes tem2 = MipsCodes_init();
+			MipsCode temp2 = new_MipsCode(MIP_MFLO);
+			temp->onlyop.op = opm1;
+			tem2->code = temp2
+			MipsCodes_link(head,tem2);
 			break;
 		case LAB:
 			MipsCode temp = new_MipsCode(MIP_LAB);
