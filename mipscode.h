@@ -22,9 +22,9 @@ typedef struct Operand_M_ {
 
 typedef struct MipsCode_
 {
-	enum { MIPS_LABEL, MIPS_LI, MIPS_LA, MIPS_MOVE, MIPS_ADDI, MIPS_ADD, MIPS_SUB, MIPS_MUL, MIPS_DIV, 
-			MIPS_MFLO, MIPS_LW, MIPS_SW, MIPS_J, MIPS_JAL, MIPS_JR, MIPS_BEQ, MIPS_BNE, MIPS_BGT, MIPS_BLT,
-			MIPS_BGE, MIPS_BLE} kind;
+	enum { MIP_LAB, MIP_LI, MIP_LA, MIP_MOVE, MIP_ADDI, MIP_ADD, MIP_SUB, MIP_MUL, MIP_DIV, 
+			MIP_MFLO, MIP_LW, MIP_SW, MIP_J, MIP_JAL, MIP_JR, MIP_BEQ, MIP_BNE, MIP_BGT, MIP_BLT,
+			MIP_BGE, MIP_BLE} kind;
 	union {
 		struct { Operand_M right, left; } assign;
 		struct { Operand_M result, op1, op2; } binop;

@@ -567,12 +567,20 @@ MipsCode translate_MipsCode(InterCode IC_code){
 			MipsCodes_link(head,tem2);
 			break;
 		case LAB:
+			MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_LAB);
 			temp->onlyop.op = new_Operand_M(MIP_LABEL,IC_code->onlyop.op->label_no);
+			tem-.code = temp;
+			MipsCodes_link(head,tem);
 			break;
 		case RET:
 			break;
 		case GOTO:
+			MipsCodes tem = MipsCodes_init();
+			MipsCode temp = new_MipsCode(MIP_J);
+			temp->onlyop.op = new_Operand_M(MIP_LABEL,IC_code->onlyop.op->label_no);
+			tem-.code = temp;
+			MipsCodes_link(head,tem);
 			break;
 		case ADDR:
 			break;
