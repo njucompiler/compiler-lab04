@@ -43,7 +43,7 @@ MipsCodes Mips_head;
 
 static char* reg[32] = {"$zero", "Sat", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7" "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$s8", "Sra"};
 void translate_MipsCodes(InterCodes IC_head);
-void translate_MipsCode(InterCode IC_code);
+void translate_MipsCode(InterCodes IC_code);
 void Mips_head_init();
 MipsCodes MipsCodes_init();
 void MipsCodes_link(MipsCodes prev,MipsCodes next);

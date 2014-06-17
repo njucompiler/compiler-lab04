@@ -64,7 +64,9 @@ void translate_MipsCodes(InterCodes IC_head){
 	MipsCodes q;
 	while(p!=NULL){
 		q = new_MipsCodes();
-		q = translate_MipsCode(p->code);
+		q = translate_MipsCode(p);
+		if(p->code->kind == COND)
+			p = p->next;
 		p = p->next;
 		q = q->next;
 	}
