@@ -66,7 +66,7 @@ Operand_M new_reg(no);
 Operand_M new_addr(int no, int offset);
 
 //function of print
-void print_MipsCodes();
+void print_MipsCodes(char* output);
 void print_Operand_M(Operand_M);
 
 void print_MIP_LAB(MipsCodes p);

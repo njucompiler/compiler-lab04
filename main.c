@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 	}
 	yyrestart(fr);
 	yyparse();
-	show_all(argv[2]);
+	show_all("itcd_output.ir");
+	print_MipsCodes(argv[2]);
 	return 0;
 }

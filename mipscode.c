@@ -236,7 +236,7 @@ void print_MIP_WRITE(MipsCodes p){
 	fputs("addi $sp, $sp, 4");
 }
 
-void print_MipsCodes(){
+void print_MipsCodes(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
 	{
