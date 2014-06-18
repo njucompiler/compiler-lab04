@@ -1,5 +1,5 @@
 #include "mipscode.h"
-
+int arg_num = 0;
 MipsCodes MipsCodes_init(){
 	MipsCodes temp = (MipsCodes)malloc(sizeof(MipsCodes_));
 	temp->prev = NULL;
@@ -42,6 +42,8 @@ Operand_M new_operand_M(int kind,int value){
 	op->is_min = 0;
 	if(kind == 0)//constant
 		op->value = value;
+	else if(kind == MIP_FUNC_op)
+		;
 	else 
 		op->label_no = value;
 	return op;
@@ -132,8 +134,8 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				reg_no = get_reg();
 				opm1 = new_addr(reg_no,0);
 				MipsCode temp = new_MipsCode(MIP_SW);
-				temp->assign.left = opm1;
-				temp->assign.right = opm2;
+				temp->assign.left = opm2;
+				temp->assign.right = opm1;
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp
 				MipsCodes_link(head,tem);
@@ -573,10 +575,25 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 			MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_LAB);
 			temp->onlyop.op = new_Operand_M(MIP_LABEL,IC_code->onlyop.op->label_no);
-			tem-.code = temp;
+			tem->code = temp;
 			MipsCodes_link(head,tem);
 			break;
 		case RET:
+			MipsCodes tem = MipsCodes_init();
+			MipsCode temp = new_MipsCode(MIP_MOVE);
+			opm1 = new_reg(2);
+			temp->assign.left = opm1;
+			//return #k
+			if(IC_code->onlyop.op->kind == CONSTANT){
+				opm2 = new_Operand_M(0,IC_code->onlyop.op->value);
+			}
+			else {
+				reg_no = get_reg();
+				opm2 = new_reg(reg_no);
+			}
+			temp->assign.right = opm2;
+			tem->code = temp;
+			MipsCodes_link(head,tem);
 			break;
 		case GOTO:
 			MipsCodes tem = MipsCodes_init();
@@ -650,20 +667,118 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 			MipsCodes_link(head,tem);
 			break;
 		case FUNC_I:
+			MipsCodes tem = MipsCodes_init();
+			MipsCode temp = new_MipsCodes(MIP_FUNC);
+			opm1 = new_Operand_M(MIP_FUNC_op,0);
+			strcmp(opm1->func,IC_code->onlyop.op->func);
+			temp->onlyop.op = opm1;
+			tem->code = temp;
+			MipsCodes_link(head,tem);
 			break;
 		case DEC:
 			break;
 		case READ:
+			MipsCodes tem = MipsCodes_init();
+                        MipsCode temp = new_MipsCode(MIP_READ);
+			tem->code = temp;
+			reg_no = get_reg();
+			opm1 = new_reg(reg_no);
+			temp->onlyop.op = opm1;
+			MipsCodes_link(head,tem);
 			break;
 		case WRITE:
+                        MipsCodes tem = MipsCodes_init();
+                        MipsCode temp = new_MipsCode(MIP_WRITE);
+                        tem->code = temp;
+                        reg_no = get_reg();
+                        opm1 = new_reg(reg_no);
+                        temp->onlyop.op = opm1;
+                        MipsCodes_link(head,tem);
 			break;
 		case CALL:
+			MipsCodes tem = MipsCodes_init();
+			MipsCode temp = new_MipsCode(MIP_ADDI);
+			opm1 = new_reg(29);
+			opm2 = new_reg(29);
+			opm3 = new_Operand_M(0,0-4*(arg_num+1));
+			temp->binop.result = opm1;
+			temp->binop.op1 = opm2;
+			temp->binop.op2 = opm3;
+			tem->code = temp;
+			MipsCodes_link(head,tem);
+			int i;
+			for(i = 0;i<arg_num;i++){
+				MipsCodes tem1 = MipsCodes_init();
+				MipsCode temp1 = new_MipsCode(MIP_SW);
+				temp1->assign.left = new_reg(i+4);
+				temp1->assign.right = new_addr(29,4*i);
+				//temp1->binop.op2 = new_Operand_M(4*i);
+				tem1->code = temp1;
+				MipsCodes_link(head,tem1);
+			}
+                        MipsCodes tem2 = MipsCodes_init();
+                        MipsCode temp2 = new_MipsCode(MIP_SW);
+                        temp2->assign.left = new_reg(31);
+                        temp2->assign.right = new_addr(29,4*i);
+                        //temp1->binop.op2 = new_Operand_M(4*i);
+			tem2->code = temp2;
+			MipsCodes_link(head,tem2);
+
+			MipsCodes tem3 = MipsCodes_init();
+			MipsCode temp3 = new_MipsCode(MIP_JAL);
+			temp3->onlyop.op = new_Operand_M(MIP_FUNC_op);
+			strcpy(temp3->onlyop.op->func,IC_code->binop.op2->func);
+			tem3->code = temp3;
+                        MipsCodes_link(head,tem3);
+			
+                        for(i = 0;i<arg_num;i++){
+                                MipsCodes tem1 = MipsCodes_init();
+                                MipsCode temp1 = new_MipsCode(MIP_LW);
+                                temp1->assign.left = new_reg(i+4);
+                                temp1->assign.right = new_addr(29,4*i);
+                                //temp1->binop.op2 = new_Operand_M(4*i);
+                                tem1->code = temp1;
+                                MipsCodes_link(head,tem1);
+                        }
+
+                        MipsCodes tem4 = MipsCodes_init();
+                        MipsCode temp4 = new_MipsCode(MIP_LW);
+                        temp4->assign.left = new_reg(31);
+                        temp4->assign.right = new_addr(29,4*i);
+                        //temp1->binop.op2 = new_Operand_M(4*i);
+                        tem4->code = temp4;
+                        MipsCodes_link(head,tem4);
+
+                        MipsCodes tem5 = MipsCodes_init();
+                        MipsCode temp5 = new_MipsCode(MIP_ADDI);
+                        opm1 = new_reg(29);
+                        opm2 = new_reg(29);
+                        opm3 = new_Operand_M(0,4*(arg_num+1));
+                        temp5->binop.result = opm1;
+                        temp5->binop.op1 = opm2;
+                        temp5->binop.op2 = opm3;
+                        tem5->code = temp5;
+                        MipsCodes_link(head,tem5);
+
+			arg_num = 0;
 			break;
 		case ARG:
+			arg_num++;
 			break;
 		case PARAM_I:
+                        MipsCodes tem = MipsCodes_init();
+                        MipsCode temp = new_MipsCode(MIP_LI);
+                        reg_no = get_reg();
+			opm1 = new_reg(reg_no);
+                 	opm2 = new_Operand_M(0,1);
+                        temp->assign.left = opm1;
+			temp->assign.right = opm2;
+                        tem->code = temp;
+                        MipsCodes_link(head,tem);
 			break;
-
+		default:
+			printf("Oh,no! FORGET!\n");
+			break;
 	}
 	return temp;
 }
