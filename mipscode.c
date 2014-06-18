@@ -1,5 +1,341 @@
 #include "mipscode.h"
+#include <string.h>
+#include <assert.h>
+
+#define REG_TABLE_SIZE 8
+FILE *fp
 int arg_num = 0;
+RegTable regtable[REG_TABLE_SIZE];
+
+void printf_init(){
+        fprintf(fp, ".data\n");
+        fprintf(fp, "_prompt: .asciiz \"Enter an integer:\"\n");
+        fprintf(fp, "_ret: .asciiz \"\\n\"\n");
+        fprintf(fp, ".globl main\n");
+        fprintf(fp, ".text\n");
+        fprintf(fp, "read:\n");
+        fprintf(fp, "   li $v0, 4\n");
+        fprintf(fp, "   la $a0, _prompt\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   li $v0, 5\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   jr $ra\n");
+        fprintf(fp, "\n");
+        fprintf(fp, "write\n");
+        fprintf(fp, "   li $v0, 1\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   li $v0, 4\n");
+        fprintf(fp, "   la $a0, _ret\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   move $v0, $0\n");
+        fprintf(fp, "   jr $ra\n\n");
+}
+
+void print_Operand_M(Operand_M p){
+        assert(p != NULL);
+        switch(p->kind){
+                case: MIP_CONSTANT{
+                      fprintf(fp, "#%d", p->value);
+                      break;
+                      }
+                case: MIP_LABEL{
+                      fprintf(fp, "label%d:", p->label_no);
+                      break;
+                      }
+                case: MIP_FUNC_OP{
+                      fprintf(fp, "%s:" ,func);
+                      break;
+                      }
+                case: MIP_ADDR_OP{
+                      fprintf(fp, "%d(%s)", p->addr_reg_no, p->offset); 
+                      break;
+                      }
+                case: MIP_REG{
+                      fprintf(fp, "%s", reg[p->reg_no]);
+                      break;
+                      }
+                default:
+                        break;
+        }
+}
+
+void print_MIP_LAB(MipsCodes p){
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_LI(MipsCodes p){
+	fputs("li ",fp);
+	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
+}
+
+void print_MIP_LA(MipsCodes p){
+	fputs("la ",fp);
+	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
+}
+
+void print_MIP_MOVE(MipsCodes p){
+	fputs("move ",fp);
+	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
+}
+
+void print_MIP_ADDI(MipsCodes p){
+	fputs("addi ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_ADD(MipsCodes p){
+	fputs("add ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_SUB(MipsCodes p){
+	fputs("sub ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_MUL(MipsCodes p){
+	fputs("mul ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_DIV(MipsCodes p){
+	fputs("div ",fp);
+	print_Operand_M(p->code->assign.right);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.left);
+}
+
+void print_MIP_MFLO(MipsCodes p){
+	fputs("mflo ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_LW(MipsCodes p){
+	fputs("lw ",fp);
+	print_Operand_M(p->code->assign.right);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.left);
+}
+
+void print_MIP_SW(MipsCodes p){
+	fputs("sw ",fp);
+	print_Operand_M(p->code->assign.right);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.left);
+}
+
+void print_MIP_J(MipsCodes p){
+	fputs("j ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_JAL(MipsCodes p){
+	fputs("jal ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_JR(MipsCodes p){
+	fputs("jr ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_BEQ(MipsCodes p){
+	fputs("beq ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BNE(MipsCodes p){
+	fputs("bne ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BGT(MipsCodes p){
+	fputs("bgt ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BLT(MipsCodes p){ 
+	fputs("blt ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BGE(MipsCodes p){
+	fputs("bge ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BLE(MipsCodes p){
+	fputs("ble ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_READ(MipsCodes p){
+     	fputs("addi $sp, $sp, -4\n", fp);
+     	fputs("sw $ra, 0($sp)\n", fp);
+	fputs("jal read\n",fp);
+	fputs("lw $ra, 0($sp)\n");
+	fputs("addi $sp, $sp, 4\n");
+	fputs("move ");
+	print_Operand_M(p->code->assign.right);
+	fputs(", $v0");
+}
+
+void print_MIP_WRITE(MipsCodes p){
+     	fputs("move $a0, ");
+	print_Operand_M(p->code->assign.left);
+	fputs("addi $sp, $sp, -4\n", fp);
+     	fputs("sw $ra, 0($sp)\n", fp);
+	fputs("jal write\n",fp);
+	fputs("lw $ra, 0($sp)\n");
+	fputs("addi $sp, $sp, 4");
+}
+
+void print_MipsCodes(char* output){
+	fp = fopen(output,"w");
+	if ( !fp )
+	{
+		perror(output);
+		return ;
+	}
+	MipsCodes p = Mips_head->next;assert(p->code!=NULL);
+	while(p!=NULL){
+		switch(p->code->kind){
+			case MIP_LAB:
+				printf_MIP_LAB(p);
+				break;
+			case MIP_LI:
+				printf_MIP_LI(p);
+				break;
+			case MIP_LA:
+				printf_MIP_LA(p);
+				break;
+			case MIP_MOVE:
+				printf_MIP_MOVE(p);
+				break;
+			case MIP_ADDI:
+				printf_MIP_ADDI(p);
+				break;
+			case MIP_ADD:
+				printf_MIP_ADD(p);
+				break;
+			case MIP_SUB:
+				printf_MIP_SUB(p);
+				break;
+			case MIP_MUL:
+				printf_MIP_MUL(p);
+				break;
+			case MIP_DIV:
+				printf_MIP_DIV(p);
+				break;
+			case MIP_MFLO:
+				printf_MIP_MFLO(p); 
+                                break; 
+                        case MIP_LW:
+				printf_MIP_LW(p);
+				break;
+			case MIP_SW:
+				printf_MIP_SW(p);
+				break;
+			case MIP_J:
+				printf_MIP_J(p);
+				break;
+			case MIP_JAL:
+				printf_MIP_JAL(p);
+				break;
+			case MIP_JR:
+				printf_MIP_JR(p);
+				break; 
+			case MIP_BEQ: 
+				printf_MIP_BEQ(p);
+				break;
+			case MIP_BNE:
+				printf_MIP_BNE(p);
+				break;
+			case MIP_BGT:
+				printf_MIP_BGT(p);
+				break;
+			case MIP_BLT:
+				printf_MIP_BLT(p);
+				break;
+			case MIP_BGE:
+				printf_MIP_BGE(p);
+				break;
+			case MIP_BLE:
+				printf_MIP_BLE(p);
+				break;
+			case MIP_READ:
+				printf_MIP_READ(p);
+				break;
+			case MIP_WRITE:
+				printf_MIP_WRITE(p);
+				break;
+			default:
+				break;
+
+		}
+		if(p->code->kind!=COND)
+			fputs("\n",fp);
+		p=p->next;
+	}
+	fclose(fp);
+}
+
+void regtable_init(){
+	int i;
+	assert(regtable);
+	for(i = 0; i < REG_TABLE_SIZE; i++){
+		regtable[i] = (RegTable)malloc(sizeof(RegTable_)); 
+		regtable[i]->kind = NO_USE; 
+	}
+}
+
+>>>>>>> a6b742b1087a3b6ba21ed1e0032fa97c7d9de7b9
 MipsCodes MipsCodes_init(){
 	MipsCodes temp = (MipsCodes)malloc(sizeof(MipsCodes_));
 	temp->prev = NULL;
@@ -74,9 +410,56 @@ void translate_MipsCodes(InterCodes IC_head){
 	}
 	Mips_head = q;
 }
-void get_reg(){
+int get_reg(int cst){
+	int i,j = 0;
+	for(i = 0; i < REG_TABLE_SIZE; i++){
+		if(regtable[i]->kind == REG_INT){
+			if(regtable[i]->value == cst){
+				return i+8;
+			}
+		}
+		else if(regtable[i]->kind == NO_USE){
+			j = i;
+		}
+	}
+	if(j == 0){
+		free(regtable[0]);
+		regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
+		regtable[0]->kind = REG_INT;
+		regtable[0]->value = cst;
+		return 0+8; 
+	}
+	else{
+		regtable[i]->kind = REG_INT;
+		regtable[i]->value = cst;
+		return j+8;
+	}
 }
-void release_reg(){
+
+int get_reg(char* name){
+	int i,j = 0;
+	for(i = 0; i < REG_TABLE_SIZE; i++){
+		if(regtable[i]->kind == REG_NAME){
+			if(strcmp(regtable[i]->name ,name) == 0){
+				return i+8;
+			}
+		}
+		else if(regtable[i]->kind == NO_USE){
+			j = i;
+		}
+	}
+	if(j == 0){
+		free(regtable[0]);
+		regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
+		regtable[0]->kind = REG_NAME;
+		strcpy(regtable[0]->name, name);
+		return 8; 
+	}
+	else{
+		regtable[j]->kind = REG_NAME;
+		strcpy(regtable[j]->name, name);
+		return j+8;
+	}
 }
 
 MipsCode translate_MipsCode(InterCodes IC_codes){
