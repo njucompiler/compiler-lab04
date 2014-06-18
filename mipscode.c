@@ -3,8 +3,61 @@
 #include <assert.h>
 
 #define REG_TABLE_SIZE 8
+FILE *fp
 
 RegTable regtable[REG_TABLE_SIZE];
+
+void printf_init(){
+        fprintf(fp, ".data\n");
+        fprintf(fp, "_prompt: .asciiz \"Enter an integer:\"\n");
+        fprintf(fp, "_ret: .asciiz \"\\n\"\n");
+        fprintf(fp, ".globl main\n");
+        fprintf(fp, ".text\n");
+        fprintf(fp, "read:\n");
+        fprintf(fp, "   li $v0, 4\n");
+        fprintf(fp, "   la $a0, _prompt\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   li $v0, 5\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   jr $ra\n");
+        fprintf(fp, "\n");
+        fprintf(fp, "write\n");
+        fprintf(fp, "   li $v0, 1\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   li $v0, 4\n");
+        fprintf(fp, "   la $a0, _ret\n");
+        fprintf(fp, "   syscall\n");
+        fprintf(fp, "   move $v0, $0\n");
+        fprintf(fp, "   jr $ra\n\n");
+}
+
+void printf_Operand_M(Operand_M p){
+        assert(p != NULL);
+        switch(p->kind){
+                case: MIP_CONSTANT{
+                      fprintf(fp, "#%d", p->value);
+                      break;
+                      }
+                case: MIP_LABEL{
+                      fprintf(fp, "label%d:", p->label_no);
+                      break;
+                      }
+                case: MIP_FUNC_OP{
+                      fprintf(fp, "%s:" ,func);
+                      break;
+                      }
+                case: MIP_ADDR_OP{
+                      fprintf(fp, "%d(%s)", p->addr_reg_no, p->offset); 
+                      break;
+                      }
+                case: MIP_REG{
+                      fprintf(fp, "%s", reg[p->reg_no]);
+                      break;
+                      }
+                default:
+                        break;
+        }
+}
 
 void regtable_init(){
 	int i;
@@ -92,7 +145,7 @@ int get_reg(int cst){
 	for(i = 0; i < REG_TABLE_SIZE; i++){
 		if(regtable[i]->kind == REG_INT){
 			if(regtable[i]->value == cst){
-				return i;
+				return i+8;
 			}
 		}
 		else if(regtable[i]->kind == NO_USE){
@@ -104,12 +157,12 @@ int get_reg(int cst){
 		regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
 		regtable[0]->kind = REG_INT;
 		regtable[0]->value = cst;
-		return 0; 
+		return 0+8; 
 	}
 	else{
 		regtable[i]->kind = REG_INT;
 		regtable[i]->value = cst;
-		return j;
+		return j+8;
 	}
 }
 
@@ -118,7 +171,7 @@ int get_reg(char* name){
 	for(i = 0; i < REG_TABLE_SIZE; i++){
 		if(regtable[i]->kind == REG_NAME){
 			if(strcmp(regtable[i]->name ,name) == 0){
-				return i;
+				return i+8;
 			}
 		}
 		else if(regtable[i]->kind == NO_USE){
@@ -130,12 +183,12 @@ int get_reg(char* name){
 		regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
 		regtable[0]->kind = REG_NAME;
 		strcpy(regtable[0]->name, name);
-		return 0; 
+		return 8; 
 	}
 	else{
 		regtable[j]->kind = REG_NAME;
 		strcpy(regtable[j]->name, name);
-		return j;
+		return j+8;
 	}
 }
 

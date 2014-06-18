@@ -15,7 +15,7 @@ typedef struct Operand_M_ {
 		int label_no;
 		char func[20];
 		struct addr_{
-			int reg_no;
+			int addr_reg_no;
 			int offset;
 		}addr
 	} ;
