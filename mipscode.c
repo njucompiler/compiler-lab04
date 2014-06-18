@@ -31,7 +31,7 @@ void printf_init(){
         fprintf(fp, "   jr $ra\n\n");
 }
 
-void printf_Operand_M(Operand_M p){
+void print_Operand_M(Operand_M p){
         assert(p != NULL);
         switch(p->kind){
                 case: MIP_CONSTANT{
@@ -59,12 +59,279 @@ void printf_Operand_M(Operand_M p){
         }
 }
 
+void print_MIP_LAB(MipsCodes p){
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_LI(MipsCodes p){
+	fputs("li ",fp);
+	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
+}
+
+void print_MIP_LA(MipsCodes p){
+	fputs("la ",fp);
+	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
+}
+
+void print_MIP_MOVE(MipsCodes p){
+	fputs("move ",fp);
+	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
+}
+
+void print_MIP_ADDI(MipsCodes p){
+	fputs("addi ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_ADD(MipsCodes p){
+	fputs("add ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_SUB(MipsCodes p){
+	fputs("sub ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_MUL(MipsCodes p){
+	fputs("mul ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_DIV(MipsCodes p){
+	fputs("div ",fp);
+	print_Operand_M(p->code->assign.right);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.left);
+}
+
+void print_MIP_MFLO(MipsCodes p){
+	fputs("mflo ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_LW(MipsCodes p){
+	fputs("lw ",fp);
+	print_Operand_M(p->code->assign.right);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.left);
+}
+
+void print_MIP_SW(MipsCodes p){
+	fputs("sw ",fp);
+	print_Operand_M(p->code->assign.right);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.left);
+}
+
+void print_MIP_J(MipsCodes p){
+	fputs("j ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_JAL(MipsCodes p){
+	fputs("jal ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_JR(MipsCodes p){
+	fputs("jr ",fp);
+	print_Operand_M(p->code->onlyop.op);
+}
+
+void print_MIP_BEQ(MipsCodes p){
+	fputs("beq ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BNE(MipsCodes p){
+	fputs("bne ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BGT(MipsCodes p){
+	fputs("bgt ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BLT(MipsCodes p){ 
+	fputs("blt ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BGE(MipsCodes p){
+	fputs("bge ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_BLE(MipsCodes p){
+	fputs("ble ",fp);
+	print_Operand_M(p->code->binop.result);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op1);
+	fputs(", ",fp);
+	print_Operand_M(p->code->binop.op2);
+}
+
+void print_MIP_READ(MipsCodes p){
+     	fputs("addi $sp, $sp, -4\n", fp);
+     	fputs("sw $ra, 0($sp)\n", fp);
+	fputs("jal read\n",fp);
+	fputs("lw $ra, 0($sp)\n");
+	fputs("addi $sp, $sp, 4\n");
+	fputs("move ");
+	print_Operand_M(p->code->assign.right);
+	fputs(", $v0");
+}
+
+void print_MIP_WRITE(MipsCodes p){
+     	fputs("move $a0, ");
+	print_Operand_M(p->code->assign.left);
+	fputs("addi $sp, $sp, -4\n", fp);
+     	fputs("sw $ra, 0($sp)\n", fp);
+	fputs("jal write\n",fp);
+	fputs("lw $ra, 0($sp)\n");
+	fputs("addi $sp, $sp, 4");
+}
+
+void print_MipsCodes(){
+	fp = fopen(output,"w");
+	if ( !fp )
+	{
+		perror(output);
+		return ;
+	}
+	MipsCodes p = Mips_head->next;assert(p->code!=NULL);
+	while(p!=NULL){
+		switch(p->code->kind){
+			case MIP_LAB:
+				printf_MIP_LAB(p);
+				break;
+			case MIP_LI:
+				printf_MIP_LI(p);
+				break;
+			case MIP_LA:
+				printf_MIP_LA(p);
+				break;
+			case MIP_MOVE:
+				printf_MIP_MOVE(p);
+				break;
+			case MIP_ADDI:
+				printf_MIP_ADDI(p);
+				break;
+			case MIP_ADD:
+				printf_MIP_ADD(p);
+				break;
+			case MIP_SUB:
+				printf_MIP_SUB(p);
+				break;
+			case MIP_MUL:
+				printf_MIP_MUL(p);
+				break;
+			case MIP_DIV:
+				printf_MIP_DIV(p);
+				break;
+			case MIP_MFLO:
+				printf_MIP_MFLO(p); 
+                                break; 
+                        case MIP_LW:
+				printf_MIP_LW(p);
+				break;
+			case MIP_SW:
+				printf_MIP_SW(p);
+				break;
+			case MIP_J:
+				printf_MIP_J(p);
+				break;
+			case MIP_JAL:
+				printf_MIP_JAL(p);
+				break;
+			case MIP_JR:
+				printf_MIP_JR(p);
+				break; 
+			case MIP_BEQ: 
+				printf_MIP_BEQ(p);
+				break;
+			case MIP_BNE:
+				printf_MIP_BNE(p);
+				break;
+			case MIP_BGT:
+				printf_MIP_BGT(p);
+				break;
+			case MIP_BLT:
+				printf_MIP_BLT(p);
+				break;
+			case MIP_BGE:
+				printf_MIP_BGE(p);
+				break;
+			case MIP_BLE:
+				printf_MIP_BLE(p);
+				break;
+			case MIP_READ:
+				printf_MIP_READ(p);
+				break;
+			case MIP_WRITE:
+				printf_MIP_WRITE(p);
+				break;
+			default:
+				break;
+
+		}
+		if(p->code->kind!=COND)
+			fputs("\n",fp);
+		p=p->next;
+	}
+	fclose(fp);
+}
+
 void regtable_init(){
 	int i;
 	assert(regtable);
 	for(i = 0; i < REG_TABLE_SIZE; i++){
-		regtable[i] = (RegTable)malloc(sizeof(RegTable_));
-		regtable[i]->kind = NO_USE;
+		regtable[i] = (RegTable)malloc(sizeof(RegTable_)); 
+		regtable[i]->kind = NO_USE; 
 	}
 }
 

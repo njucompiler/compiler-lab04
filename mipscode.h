@@ -25,7 +25,7 @@ typedef struct MipsCode_
 {
 	enum { MIP_LAB, MIP_LI, MIP_LA, MIP_MOVE, MIP_ADDI, MIP_ADD, MIP_SUB, MIP_MUL, MIP_DIV, 
 			MIP_MFLO, MIP_LW, MIP_SW, MIP_J, MIP_JAL, MIP_JR, MIP_BEQ, MIP_BNE, MIP_BGT, MIP_BLT,
-			MIP_BGE, MIP_BLE} kind;
+			MIP_BGE, MIP_BLE, MIP_READ, MIP_WRITE} kind;
 	union {
 		struct { Operand_M right, left; } assign;
 		struct { Operand_M result, op1, op2; } binop;
@@ -64,5 +64,33 @@ Operand_M new_label_M();
 //Operand_M new_temp();
 Operand_M new_reg(no);
 Operand_M new_addr(int no, int offset);
+
+//function of print
+void print_MipsCodes();
+void print_Operand_M(Operand_M);
+
+void print_MIP_LAB(MipsCodes p);
+void print_MIP_LI(MipsCodes p);
+void print_MIP_LA(MipsCodes p);
+void print_MIP_MOVE(MipsCodes p);
+void print_MIP_ADDI(MipsCodes p);
+void print_MIP_ADD(MipsCodes p);
+void print_MIP_SUB(MipsCodes p);
+void print_MIP_MUL(MipsCodes p);
+void print_MIP_DIV(MipsCodes p);
+void print_MIP_MFLO(MipsCodes p);
+void print_MIP_LW(MipsCodes p);
+void print_MIP_SW(MipsCodes p);
+void print_MIP_J(MipsCodes p);
+void print_MIP_JAL(MipsCodes p);
+void print_MIP_JR(MipsCodes p);
+void print_MIP_BEQ(MipsCodes p);
+void print_MIP_BNE(MipsCodes p);
+void print_MIP_BGT(MipsCodes p);
+void print_MIP_BLT(MipsCodes p);
+void print_MIP_BGE(MipsCodes p);
+void print_MIP_BLE(MipsCodes p);
+void print_MIP_READ(MipsCodes p);
+void print_MIP_WRITE(MipsCodes p);
 
 #endif
