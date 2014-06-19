@@ -1,16 +1,11 @@
 #include "mipscode.h"
 #include <string.h>
 #include <assert.h>
-<<<<<<< HEAD
-#include <stdio.h>
-=======
 #include "intercode.h"
->>>>>>> 4e86b57391e0c79b72784bfc3590cd165f736fb2
 
-#define REG_TABLE_SIZE 14
-FILE *fp;
+#define REG_TABLE_SIZE 8
+FILE *fp
 int arg_num = 0;
-int reg_t,reg_a,reg_v;
 RegTable regtable[REG_TABLE_SIZE];
 
 void printf_init(){
@@ -40,21 +35,26 @@ void printf_init(){
 void print_Operand_M(Operand_M p){
         assert(p != NULL);
         switch(p->kind){
-                case MIP_CONSTANT:
+                case: MIP_CONSTANT{
                       fprintf(fp, "#%d", p->value);
                       break;
-                case MIP_LABEL:
+                      }
+                case: MIP_LABEL{
                       fprintf(fp, "label%d:", p->label_no);
                       break;
-                case MIP_FUNC_op:
-                      fprintf(fp, "%s:" ,p->func);
+                      }
+                case: MIP_FUNC_OP{
+                      fprintf(fp, "%s:" ,func);
                       break;
-                case MIP_ADDR_op:
-                      fprintf(fp, "%d(%s)", p->addr.addr_reg_no, p->addr.offset); 
+                      }
+                case: MIP_ADDR_OP{
+                      fprintf(fp, "%d(%s)", p->addr_reg_no, p->offset); 
                       break;
-                case MIP_REG:
+                      }
+                case: MIP_REG{
                       fprintf(fp, "%s", reg[p->reg_no]);
                       break;
+                      }
                 default:
                         break;
         }
@@ -125,7 +125,7 @@ void print_MIP_DIV(MipsCodes p){
 	fputs("div ",fp);
 	print_Operand_M(p->code->assign.right);
 	fputs(", ",fp);
-	print_Operand_M(p->code->assign.left);
+	print_Operand_M(p->code->binop.left);
 }
 
 void print_MIP_MFLO(MipsCodes p){
@@ -133,10 +133,6 @@ void print_MIP_MFLO(MipsCodes p){
 	print_Operand_M(p->code->onlyop.op);
 }
 
-void print_MIP_LW(MipsCodes p){
-	fputs("lw ",fp);
-	print_Operand_M(p->code->assign.right);
-	fputs(", ",fp);
 	print_Operand_M(p->code->assign.left);
 }
 
@@ -496,8 +492,8 @@ int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
         }
 }*/
 
-MipsCode translate_MipsCode(InterCodes IC_codes){
-	InterCode IC_code = IC_codes->code->kind;
+void translate_MipsCode(InterCodes IC_codes){
+	InterCode IC_code = IC_codes->code;
 	//MipsCode temp = new_MipsCode();
 	Operand_M opm1 = NULL,opm2 = NULL,opm3 = NULL;
 	MipsCodes Mips_head = NULL;
@@ -516,7 +512,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp;
 				MipsCodes_link(Mips_head,tem);
-				return 
+				return; 
 			}
 			//x:=y
 			else if(IC_code->assign.right->kind == VARIABLE || IC_code->assign.right->kind == TEMP){
@@ -545,7 +541,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				MipsCodes_link(Mips_head,tem);
 			}
 			//*x:=y
-			else if(IC_code->assign.left->kind == ADDR_op && IC_code->assign.rigt->kind != ADDR_op){
+			else if(IC_code->assign.left->kind == ADDR_op && IC_code->assign.right->kind != ADDR_op){
 				reg_no = get_reg(0);
 				opm2 = new_reg(reg_no);
 				reg_no = get_reg(0);
@@ -567,9 +563,9 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				opm2 = new_reg(reg_no);
 				opm3 = new_Operand_M(0,IC_code->binop.op1->value);
 				MipsCode temp = new_MipsCode(MIP_ADDI);
-				temp->binop->result = opm1;
-				temp->binop->left = opm2;
-				temp->binop->right = opm3;	
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				temp->binop.op2 = opm3;	
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp;
 				MipsCodes_link(Mips_head,tem);			
@@ -582,9 +578,9 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				opm3 = new_reg(reg_no);
 				opm2 = new_Operand_M(0,IC_code->binop.op2->value);
 				MipsCode temp = new_MipsCode(MIP_ADDI);
-				temp->binop->result = opm1;
-				temp->binop->left = opm2;
-				temp->binop->right = opm3;
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				temp->binop.op2 = opm3;
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp;
 				MipsCodes_link(Mips_head,tem);
@@ -680,18 +676,18 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				MipsCode temp1 = new_MipsCode(MIP_ADDI);		//addi reg(x) reg(x) k
 				temp1->binop.result = opm1;
 				temp1->binop.op1 = opm1;
-				temp1->binop.op3 = new_Operand_M(0,IC_code->binop.op2->value);
+				temp1->binop.op2 = new_Operand_M(0,IC_code->binop.op2->value);
 				MipsCodes tem1 = MipsCodes_init();
 				tem1->code = temp1;
 				MipsCodes_link(Mips_head,tem1);
 			}
 			//x:=#k+*y
 			if(IC_code->binop.op1->kind == CONSTANT && IC_code->binop.op2->kind == ADDR_op){
-				reg_no = get_reg();
+				reg_no = get_reg(0);
 				opm1 = new_reg(reg_no);
 				//reg_no = get_reg();
 				//opm2 = new_addr(reg_no,0);
-				reg_no = get_reg();
+				reg_no = get_reg(0);
 				opm3 = new_addr(reg_no,0);
 				MipsCode temp = new_MipsCode(MIP_LW);		//lw reg(x) reg(y)
 				temp->assign.left = opm1;
@@ -718,9 +714,9 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				opm2 = new_reg(reg_no);
 				opm3 = new_Operand_M(0,IC_code->binop.op1->value);
 				MipsCode temp = new_MipsCode(MIP_ADDI);
-				temp->binop->result = opm1;
-				temp->binop->left = opm2;
-				temp->binop->right = opm3;	
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				temp->binop.op2 = opm3;	
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp;
 				MipsCodes_link(Mips_head,tem);			
@@ -733,9 +729,9 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				opm3 = new_reg(reg_no);
 				opm2 = new_Operand_M(0,IC_code->binop.op2->value);
 				MipsCode temp = new_MipsCode(MIP_ADDI);
-				temp->binop->result = opm1;
-				temp->binop->left = opm2;
-				temp->binop->right = opm3;
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				temp->binop.op2 = opm3;
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp;
 				MipsCodes_link(Mips_head,tem);
@@ -759,7 +755,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				temp1->binop.op1 = opm2;
 				temp1->binop.op2 = opm1;
 				MipsCodes tem1 = MipsCodes_init();
-				tem1->code = temp1
+				tem1->code = temp1;
 				MipsCodes_link(Mips_head,tem1);
 			}
 			//x:=*y-z
@@ -831,7 +827,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				MipsCode temp1 = new_MipsCode(MIP_ADDI);		//addi reg(x) reg(x) k
 				temp1->binop.result = opm1;
 				temp1->binop.op1 = opm1;
-				temp1->binop.op3 = new_Operand_M(0,IC_code->binop.op2->value);
+				temp1->binop.op2 = new_Operand_M(0,IC_code->binop.op2->value);
 				MipsCodes tem1 = MipsCodes_init();
 				tem1->code = temp1;
 				MipsCodes_link(Mips_head,tem1);
@@ -914,13 +910,13 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 				MipsCodes_link(Mips_head,tem);
 			}
 			//x:=y*z
-			MipsCodes tem1 = MipsCodes_init();
+			{MipsCodes tem1 = MipsCodes_init();
 			MipsCode temp1 = new_MipsCode(MIP_MUL);
 			temp1->binop.result = opm1;
 			temp1->binop.op1 = opm2;
 			temp1->binop.op2 = opm3;
-			tem1->code = temp1
-			MipsCodes_link(Mips_head,tem1);
+			tem1->code = temp1;
+			MipsCodes_link(Mips_head,tem1);}
 			break;
 		case DIVI:
 			reg_no = get_reg(0);
@@ -980,12 +976,12 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 			MipsCode temp1 = new_MipsCode(MIP_DIV);
 			temp1->assign.left = opm2;
 			temp1->assign.right = opm3;
-			tem1->code = temp1
+			tem1->code = temp1;
 			MipsCodes_link(Mips_head,tem1);
 			MipsCodes tem2 = MipsCodes_init();
 			MipsCode temp2 = new_MipsCode(MIP_MFLO);
-			temp->onlyop.op = opm1;
-			tem2->code = temp2
+			temp2->onlyop.op = opm1;
+			tem2->code = temp2;
 			MipsCodes_link(Mips_head,tem2);
 			break;
 		case LAB:
@@ -998,7 +994,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 		case RET:
 			MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_MOVE);
-                        reg_no = get_reg(2)
+                        reg_no = get_reg(2);
 			opm1 = new_reg(reg_no);
 			temp->assign.left = opm1;
 			//return #k
@@ -1017,7 +1013,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 			MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_J);
 			temp->onlyop.op = new_Operand_M(MIP_LABEL,IC_code->onlyop.op->label_no);
-			tem-.code = temp;
+			tem->code = temp;
 			MipsCodes_link(Mips_head,tem);
 			break;
 		case ADDR:
@@ -1168,42 +1164,3 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
                         MipsCodes_link(Mips_head,tem4);
 
                         MipsCodes tem5 = MipsCodes_init();
-                        MipsCode temp5 = new_MipsCode(MIP_ADDI);
-                        opm1 = new_reg(29);
-                        opm2 = new_reg(29);
-                        opm3 = new_Operand_M(0,4*(arg_num+1));
-                        temp5->binop.result = opm1;
-                        temp5->binop.op1 = opm2;
-                        temp5->binop.op2 = opm3;
-                        tem5->code = temp5;
-                        MipsCodes_link(Mips_head,tem5);
-
-			arg_num = 0;
-			break;
-		case ARG:
-			arg_num++;
-			break;
-		case PARAM_I:
-                        MipsCodes tem = MipsCodes_init();
-                        MipsCode temp = new_MipsCode(MIP_LI);
-                        reg_no = get_reg(0);
-			opm1 = new_reg(reg_no);
-                 	opm2 = new_Operand_M(0,1);
-                        temp->assign.left = opm1;
-			temp->assign.right = opm2;
-                        tem->code = temp;
-                        MipsCodes_link(Mips_head,tem);
-			break;
-		default:
-			printf("Oh,no! FORGET!\n");
-			break;
-	}
-	return temp;
-}
-
-void cal_MipsCodes(char* output){
-        printf_init();
-        Mips_head_init();
-        translate_MipsCodes(intercodes_head->next);
-        print_MipsCodes(output);
-}
