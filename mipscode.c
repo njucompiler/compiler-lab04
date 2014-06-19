@@ -787,6 +787,21 @@ void translate_MipsCode(InterCodes IC_codes){
 				MipsCodes tem1 = MipsCodes_init();
 				tem1->code = temp1;
 				MipsCodes_link(Mips_head,tem1);
+			}//x:=y+z
+			if(IC_code->binop.op1->kind != ADDR_op && IC_code->binop.op1->kind != CONSTANT&&IC_code->binop.op2->kind != ADDR_op && IC_code->binop.op2->kind != CONSTANT){
+				reg_no = get_reg(IC_code->binop.result);
+				opm1 = new_reg(reg_no);
+				reg_no = get_reg(IC_code->binop.op1);
+				opm2 = new_reg(reg_no);
+				reg_no = get_reg(IC_code->binop.op2);
+				opm3 = new_reg(reg_no);
+				MipsCode temp = new_MipsCode(MIP_ADD);
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				temp->binop.op2 = opm3;	
+				MipsCodes tem = MipsCodes_init();
+				tem->code = temp;
+				MipsCodes_link(Mips_head,tem);	
 			}
 			//x:=#k+#k
 			break;
