@@ -18,8 +18,8 @@ typedef struct Operand_M_ {
 		struct addr_{
 			int addr_reg_no;
 			int offset;
-		}addr
-	} ;
+		}addr;
+	};
 }Operand_M_;
 
 typedef struct MipsCode_
