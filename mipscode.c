@@ -392,13 +392,8 @@ Operand_M new_reg(no){
 }
 Operand_M new_addr(int no, int offset){
 	Operand_M op = (Operand_M)malloc(sizeof(Operand_M_));
-<<<<<<< HEAD
 	op->kind = MIP_ADDR_op;
 	op->addr.addr_reg_no = no;
-=======
-	op->kind = MIPS_OP_ADDR;
-	op->addr.reg_no = no;
->>>>>>> 4e86b57391e0c79b72784bfc3590cd165f736fb2
 	op->addr.offset = offset;
 	return op;
 }
