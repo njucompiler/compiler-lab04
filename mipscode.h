@@ -1,5 +1,6 @@
 #ifndef _MIPSCODE_H_
 #define _MIPSCODE_H_
+#include "intercode.h"
 
 typedef struct Operand_M_* Operand_M;
 typedef struct MipsCode_* MipsCode;
@@ -58,11 +59,11 @@ Operand_M new_operand_M(int kind,int value);
 //Operand_M new_operand_name(char* name);
 Operand_M new_label_M();
 //Operand_M new_temp();
-Operand_M new_reg(no);
+Operand_M new_reg(int no);
 Operand_M new_addr(int no, int offset);
 
 int get_reg(int kind);
-int get_reg_name(char* name,int kind);
+//int get_reg_name(char* name,int kind);
 //function of print
 void regtable_init();
 
