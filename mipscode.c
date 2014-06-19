@@ -38,7 +38,7 @@ void print_Operand_M(Operand_M p){
         assert(p != NULL);
         switch(p->kind){
                 case MIP_CONSTANT:{
-                      fprintf(fp, "#%d", p->value);
+                      fprintf(fp, "%d", p->value);
                       break;
                       }
                 case MIP_LABEL:{
@@ -256,7 +256,7 @@ void print_MIP_READ(MipsCodes p){
 
 void print_MIP_WRITE(MipsCodes p){
     fputs("   move $a0, ",fp);
-	print_Operand_M(p->code->assign.left);
+	print_Operand_M(p->code->onlyop.op);
 	fputs("\n",fp);
 	fputs("   addi $sp, $sp, -4\n", fp);
     fputs("   sw $ra, 0($sp)\n", fp);
