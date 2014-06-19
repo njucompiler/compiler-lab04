@@ -1142,7 +1142,7 @@ void translate_MipsCode(InterCodes IC_codes){
 			}
 			//if x!=y GOTO z
 			if(strcmp(IC_code->cond.op->op,"!=") == 0){
-				temp = new_MipsCode(MIP_BEQ);
+				temp = new_MipsCode(MIP_BEQ1);
 			}
 			//if x>y GOTO z
 			if(strcmp(IC_code->cond.op->op,">") == 0){
