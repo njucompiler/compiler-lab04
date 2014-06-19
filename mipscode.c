@@ -1014,7 +1014,13 @@ void translate_MipsCode(InterCodes IC_codes){
 			}
 			temp->assign.right = opm2;
 			tem->code = temp;
-			MipsCodes_link(Mips_head,tem);}
+			MipsCodes_link(Mips_head,tem);
+			MipsCodes tem1 = MipsCodes_init();
+			MipsCode temp1 = new_MipsCode(MIP_JR);
+			temp1->onlyop.op = new_reg(31);
+			tem1->code = temp1;
+			MipsCodes_link(Mips_head,tem1);
+			}
 			break;
 		case GOTO:;
 			{MipsCodes tem = MipsCodes_init();
