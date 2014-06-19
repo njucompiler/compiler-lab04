@@ -46,6 +46,7 @@ MipsCodes Mips_head;
 typedef struct RegTable_
 {
 	enum{NO_USE, REG_USE} kind;
+	char name[20];
 }RegTable_;
 
 static char* reg[32] = {"$zero", "Sat", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7" "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$s8", "Sra"};
@@ -62,7 +63,8 @@ Operand_M new_label_M();
 Operand_M new_reg(int no);
 Operand_M new_addr(int no, int offset);
 
-int get_reg(int kind);
+int get_other_reg(int kind);//1 $a,2 $v
+int get_reg(Operand op);
 //int get_reg_name(char* name,int kind);
 //function of print
 void regtable_init();

@@ -63,10 +63,12 @@ void print_Operand_M(Operand_M p){
 }
 
 void print_MIP_LAB(MipsCodes p){
+	fprintf(fp, "   ");
 	print_Operand_M(p->code->onlyop.op);
 }
 
 void print_MIP_LI(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("li ",fp);
 	print_Operand_M(p->code->assign.left);
 	fputs(", ",fp);
@@ -74,6 +76,7 @@ void print_MIP_LI(MipsCodes p){
 }
 
 void print_MIP_LA(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("la ",fp);
 	print_Operand_M(p->code->assign.left);
 	fputs(", ",fp);
@@ -81,6 +84,7 @@ void print_MIP_LA(MipsCodes p){
 }
 
 void print_MIP_MOVE(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("move ",fp);
 	print_Operand_M(p->code->assign.left);
 	fputs(", ",fp);
@@ -88,6 +92,7 @@ void print_MIP_MOVE(MipsCodes p){
 }
 
 void print_MIP_ADDI(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("addi ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -97,6 +102,7 @@ void print_MIP_ADDI(MipsCodes p){
 }
 
 void print_MIP_ADD(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("add ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -106,6 +112,7 @@ void print_MIP_ADD(MipsCodes p){
 }
 
 void print_MIP_SUB(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("sub ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -115,6 +122,7 @@ void print_MIP_SUB(MipsCodes p){
 }
 
 void print_MIP_MUL(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("mul ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -124,6 +132,7 @@ void print_MIP_MUL(MipsCodes p){
 }
 
 void print_MIP_DIV(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("div ",fp);
 	print_Operand_M(p->code->assign.right);
 	fputs(", ",fp);
@@ -131,17 +140,20 @@ void print_MIP_DIV(MipsCodes p){
 }
 
 void print_MIP_MFLO(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("mflo ",fp);
 	print_Operand_M(p->code->onlyop.op);
 }
 void print_MIP_LW(MipsCodes p){
-        fputs("lw ",fp);
-        print_Operand_M(p->code->assign.right);
-        fputs(", ",fp);
+	fprintf(fp, "   ");
+    fputs("lw ",fp);
+    print_Operand_M(p->code->assign.right);
+    fputs(", ",fp);
 	print_Operand_M(p->code->assign.left);
 }
 
 void print_MIP_SW(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("sw ",fp);
 	print_Operand_M(p->code->assign.right);
 	fputs(", ",fp);
@@ -149,21 +161,26 @@ void print_MIP_SW(MipsCodes p){
 }
 
 void print_MIP_J(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("j ",fp);
 	print_Operand_M(p->code->onlyop.op);
 }
 
 void print_MIP_JAL(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("jal ",fp);
 	print_Operand_M(p->code->onlyop.op);
 }
 
 void print_MIP_JR(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("jr ",fp);
-	print_Operand_M(p->code->onlyop.op);
+	fputs("$ra",fp);
+	//print_Operand_M(p->code->onlyop.op);
 }
 
 void print_MIP_BEQ(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("beq ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -173,6 +190,7 @@ void print_MIP_BEQ(MipsCodes p){
 }
 
 void print_MIP_BNE(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("bne ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -182,6 +200,7 @@ void print_MIP_BNE(MipsCodes p){
 }
 
 void print_MIP_BGT(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("bgt ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -191,6 +210,7 @@ void print_MIP_BGT(MipsCodes p){
 }
 
 void print_MIP_BLT(MipsCodes p){ 
+	fprintf(fp, "   ");
 	fputs("blt ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -209,6 +229,7 @@ void print_MIP_BGE(MipsCodes p){
 }
 
 void print_MIP_BLE(MipsCodes p){
+	fprintf(fp, "   ");
 	fputs("ble ",fp);
 	print_Operand_M(p->code->binop.result);
 	fputs(", ",fp);
@@ -252,7 +273,6 @@ void print_MipsCodes(char* output){
         printf_init();
 	MipsCodes p = Mips_head->next;assert(p->code!=NULL);
 	while(p!=NULL){
-		fprintf(fp, "   ");
 		switch(p->code->kind){
 			case MIP_LAB:
 				print_MIP_LAB(p);
@@ -344,6 +364,7 @@ void regtable_init(){
 	for(i = 0; i < REG_TABLE_SIZE; i++){
 		regtable[i] = (RegTable)malloc(sizeof(RegTable_)); 
 		regtable[i]->kind = NO_USE; 
+		memset(regtable[i]->name,"\0");
 	}
 }
 
@@ -415,13 +436,96 @@ void translate_MipsCodes(InterCodes IC_head){
 		p = p->next;
 	}
 }
-int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
+
+int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
+	if(op->kind == VARIABLE){
+        	int i,j = 0;
+        	for(i = 0; i < 8; i++){
+	        	if(regtable[i]->kind == REG_USE){
+		        	if(strcmp(regtable[i]->name ,op->name) == 0){
+			        	return i+8;
+			        }
+		        }
+        		else if(regtable[i]->kind == NO_USE){
+	        		j = i;
+	        	}
+	        }
+        	if(j == 0){
+	        	reg_t ++;
+	        	regtable[reg_t % 8]->kind = REG_USE;
+	        	memset(regtable[reg_t % 8]->name,"\0");
+		        strcpy(regtable[reg_t % 8]->name, op->name);
+        		return ((reg_t % 8) + 8); 
+        	}
+        	else{
+        		regtable[j]->kind = REG_USE;
+        		strcpy(regtable[j]->name, op->name);
+        		return j+8;
+        	}
+        }
+    else if(op->kind == TEMP){
+    	char name[20] = "t";
+    	char num[4];
+    	sprintf(num,"%d",a);
+    	strcat(name,num);
+    	int i,j = 0;
+        	for(i = 0; i < 8; i++){
+	        	if(regtable[i]->kind == REG_USE){
+		        	if(strcmp(regtable[i]->name ,name) == 0){
+			        	return i+8;
+			        }
+		        }
+        		else if(regtable[i]->kind == NO_USE){
+	        		j = i;
+	        	}
+	        }
+        	if(j == 0){
+	        	reg_t ++;
+	        	regtable[reg_t % 8]->kind = REG_USE;
+	        	memset(regtable[reg_t % 8]->name,"\0");
+		        strcpy(regtable[reg_t % 8]->name, name);
+        		return ((reg_t % 8) + 8); 
+        	}
+        	else{
+        		regtable[j]->kind = REG_USE;
+        		strcpy(regtable[j]->name, name);
+        		return j+8;
+        	}
+    }
+}
+
+int get_other_reg(int kind){
+		if(kind == 1){
+                int i;
+                for(i = 8; i < 12; i++){
+                        if(regtable[i]->kind == NO_USE){
+                                regtable[i]->kind = REG_USE;
+                                return i-4; 
+                        }
+                }
+                reg_a ++;
+                return ((reg_a % 4) + 4);
+        }
+        else if(kind == 2){
+                int i;
+                for(i = 12; i < 14; i++){
+                        if(regtable[i]->kind == NO_USE){
+                                regtable[i]->kind = REG_USE;
+                                return i-10;
+                        }
+                }
+                reg_v++;
+                return ((reg_v % 2) + 2);
+        }
+}
+
+/*int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
 	if(kind == 0){
             int i;
         	for(i = 0; i < 8; i++){
         		if(regtable[i]->kind == NO_USE){
-			        regtable[i]->kind == REG_USE;
-                                return i + 8;
+			        regtable[i]->kind = REG_USE;
+                    return i + 8;
 		        }
 	        }
                 reg_t ++;
@@ -449,56 +553,8 @@ int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
                 reg_v++;
                 return ((reg_v % 2) + 2);
         }
-}
-
-/*int get_reg_name(char* name, int kind){
-	if(kind == 0){
-                int i,j = 0;
-        	for(i = 0; i < REG_TABLE_SIZE; i++){
-	        	if(regtable[i]->kind == REG_NAME){
-		        	if(strcmp(regtable[i]->name ,name) == 0){
-			        	return i+8;
-			        }
-		        }
-        		else if(regtable[i]->kind == NO_USE){
-	        		j = i;
-	        	}
-	        }
-        	if(j == 0){
-	        	free(regtable[0]);
-		        regtable[0] = (Reg_Table)malloc(sizeof(Reg_Table_));
-	        	regtable[0]->kind = REG_NAME;
-		        strcpy(regtable[0]->name, name);
-        		return 8; 
-        	}
-        	else{
-        		regtable[j]->kind = REG_NAME;
-        		strcpy(regtable[j]->name, name);
-        		return j+8;
-        	}
-
-        }
-        else if(kind == 1){
-                int i, j = 0;
-                for(i = 8; i < 12; i++){
-                        if(regtable[i]->kind == NO_USE){
-                                regtable[i]->kind = REG_INT;
-                                return i-4; 
-                        }
-                }
-                return 4;
-        }
-        else if(kind == 2){
-                int i, j = 0;
-                for(i = 12; i < 14; i++){
-                        if(regtable[i]->kind == NO_USE){
-                                regtable[i]->kind = REG_INT;
-                                return i-10;
-                        }
-                }
-                return 12;
-        }
 }*/
+
 
 void translate_MipsCode(InterCodes IC_codes){
 	InterCode IC_code = IC_codes->code;
