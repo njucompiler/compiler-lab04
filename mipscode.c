@@ -42,7 +42,7 @@ void print_Operand_M(Operand_M p){
                       break;
                       }
                 case MIP_LABEL:{
-                      fprintf(fp, "label%d:", p->label_no);
+                      fprintf(fp, "label%d", p->label_no);
                       break;
                       }
                 case MIP_FUNC_op:{
@@ -63,8 +63,9 @@ void print_Operand_M(Operand_M p){
 }
 
 void print_MIP_LAB(MipsCodes p){
-	fprintf(fp, "   ");
+	//fprintf(fp, "   ");
 	print_Operand_M(p->code->onlyop.op);
+	fputs(":",fp);
 }
 
 void print_MIP_LI(MipsCodes p){
@@ -256,6 +257,7 @@ void print_MIP_READ(MipsCodes p){
 void print_MIP_WRITE(MipsCodes p){
     fputs("   move $a0, ",fp);
 	print_Operand_M(p->code->assign.left);
+	fputs("\n",fp);
 	fputs("   addi $sp, $sp, -4\n", fp);
     fputs("   sw $ra, 0($sp)\n", fp);
 	fputs("   jal write\n",fp);
@@ -364,7 +366,7 @@ void regtable_init(){
 	for(i = 0; i < REG_TABLE_SIZE; i++){
 		regtable[i] = (RegTable)malloc(sizeof(RegTable_)); 
 		regtable[i]->kind = NO_USE; 
-		memset(regtable[i]->name,"\0");
+		memset(regtable[i]->name,0,20);
 	}
 }
 
@@ -438,6 +440,26 @@ void translate_MipsCodes(InterCodes IC_head){
 }
 
 int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
+	/*if(op->kind == CONSTANT){
+		int i,j = 0;
+        	for(i = 0; i < 8; i++){
+        		if(regtable[i]->kind == NO_USE){
+	        		j = i;
+	        	}
+	        }
+        	if(j == 0){
+	        	reg_t ++;
+	        	regtable[reg_t % 8]->kind = REG_USE;
+	        	memset(regtable[reg_t % 8]->name,0,20);
+		        strcpy(regtable[reg_t % 8]->name, op->name);
+        		return ((reg_t % 8) + 8); 
+        	}
+        	else{
+        		regtable[j]->kind = REG_USE;
+        		strcpy(regtable[j]->name, op->name);
+        		return j+8;
+        	}
+	}*/
 	if(op->kind == VARIABLE){
         	int i,j = 0;
         	for(i = 0; i < 8; i++){
@@ -453,7 +475,7 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         	if(j == 0){
 	        	reg_t ++;
 	        	regtable[reg_t % 8]->kind = REG_USE;
-	        	memset(regtable[reg_t % 8]->name,"\0");
+	        	memset(regtable[reg_t % 8]->name,0,20);
 		        strcpy(regtable[reg_t % 8]->name, op->name);
         		return ((reg_t % 8) + 8); 
         	}
@@ -466,7 +488,7 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
     else if(op->kind == TEMP){
     	char name[20] = "t";
     	char num[4];
-    	sprintf(num,"%d",a);
+    	sprintf(num,"%d",op->var_no);
     	strcat(name,num);
     	int i,j = 0;
         	for(i = 0; i < 8; i++){
@@ -482,7 +504,7 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         	if(j == 0){
 	        	reg_t ++;
 	        	regtable[reg_t % 8]->kind = REG_USE;
-	        	memset(regtable[reg_t % 8]->name,"\0");
+	        	memset(regtable[reg_t % 8]->name,0,20);
 		        strcpy(regtable[reg_t % 8]->name, name);
         		return ((reg_t % 8) + 8); 
         	}
@@ -567,7 +589,7 @@ void translate_MipsCode(InterCodes IC_codes){
 			if(IC_code->assign.right->kind == CONSTANT){
 				//temp->assign.left->kind = MIP_CONSTANT;
 				opm1 = new_operand_M(0,IC_code->assign.right->value);
-				reg_no = get_reg(IC_code->assign.right);
+				reg_no = get_reg(IC_code->assign.left);
 				opm2 = new_reg(reg_no);
 				MipsCode temp = new_MipsCode(MIP_LI);
 				temp->assign.right = opm1;
@@ -1057,8 +1079,8 @@ void translate_MipsCode(InterCodes IC_codes){
 		case RET:;
 			{MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_MOVE);
-           		reg_no = get_reg(IC_code->assign.left);
-			opm1 = new_reg(reg_no);
+           	//reg_no = get_reg(IC_code->onlyop.op);
+			opm1 = new_reg(2);
 			temp->assign.left = opm1;
 			//return #k
 			if(IC_code->onlyop.op->kind == CONSTANT){
