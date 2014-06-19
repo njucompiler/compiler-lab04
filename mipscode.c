@@ -1199,6 +1199,7 @@ MipsCode translate_MipsCode(InterCodes IC_codes){
 }
 
 void cal_MipsCodes(char* output){
+        print("nihao");
         printf_init();
         Mips_head_init();
         translate_MipsCodes(intercodes_head->next);
