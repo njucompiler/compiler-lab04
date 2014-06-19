@@ -1142,23 +1142,23 @@ void translate_MipsCode(InterCodes IC_codes){
 			}
 			//if x!=y GOTO z
 			if(strcmp(IC_code->cond.op->op,"!=") == 0){
-				temp = new_MipsCode(MIP_BEQ);
+				temp = new_MipsCode(MIP_BNE);
 			}
 			//if x>y GOTO z
 			if(strcmp(IC_code->cond.op->op,">") == 0){
-				temp = new_MipsCode(MIP_BEQ);
+				temp = new_MipsCode(MIP_BGT);
 			}
 			//if x<y GOTO z
 			if(strcmp(IC_code->cond.op->op,"<") == 0){
-				temp = new_MipsCode(MIP_BEQ);
+				temp = new_MipsCode(MIP_BLT);
 			}
 			//if x>=y GOTO z
 			if(strcmp(IC_code->cond.op->op,">=") == 0){
-				temp = new_MipsCode(MIP_BEQ);
+				temp = new_MipsCode(MIP_BGE);
 			}
 			//if x<=y GOTO z
 			if(strcmp(IC_code->cond.op->op,"<=") == 0){
-				temp = new_MipsCode(MIP_BEQ);
+				temp = new_MipsCode(MIP_BLE);
 			}
 			reg_no = get_reg(IC_code->cond.op1);
 			Operand_M opm1 = new_reg(reg_no);
