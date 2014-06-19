@@ -92,6 +92,7 @@ void print_MIP_BGT(MipsCodes p);
 void print_MIP_BLT(MipsCodes p);
 void print_MIP_BGE(MipsCodes p);
 void print_MIP_BLE(MipsCodes p);
+void print_MIP_FUNC(MipsCodes p);
 void print_MIP_READ(MipsCodes p);
 void print_MIP_WRITE(MipsCodes p);
 

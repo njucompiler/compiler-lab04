@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "intercode.h"
 
-#define REG_TABLE_SIZE 8
+#define REG_TABLE_SIZE 14
 FILE *fp;
 int arg_num = 0;
 int reg_t, reg_a, reg_v;
@@ -24,7 +24,7 @@ void printf_init(){
         fprintf(fp, "   syscall\n");
         fprintf(fp, "   jr $ra\n");
         fprintf(fp, "\n");
-        fprintf(fp, "write\n");
+        fprintf(fp, "write:\n");
         fprintf(fp, "   li $v0, 1\n");
         fprintf(fp, "   syscall\n");
         fprintf(fp, "   li $v0, 4\n");
@@ -217,25 +217,29 @@ void print_MIP_BLE(MipsCodes p){
 	print_Operand_M(p->code->binop.op2);
 }
 
+void print_MIP_FUNC(MipsCodes p){
+	print_Operand_M(p->code->onlyop.op);
+}
+
 void print_MIP_READ(MipsCodes p){
-     	fputs("addi $sp, $sp, -4\n", fp);
-     	fputs("sw $ra, 0($sp)\n", fp);
-	fputs("jal read\n",fp);
-	fputs("lw $ra, 0($sp)\n",fp);
-	fputs("addi $sp, $sp, 4\n",fp);
-	fputs("move ",fp);
-	print_Operand_M(p->code->assign.right);
+    fputs("   addi $sp, $sp, -4\n", fp);
+    fputs("   sw $ra, 0($sp)\n", fp);
+	fputs("   jal read\n",fp);
+	fputs("   lw $ra, 0($sp)\n",fp);
+	fputs("   addi $sp, $sp, 4\n",fp);
+	fputs("   move ",fp);
+	print_Operand_M(p->code->onlyop.op);
 	fputs(", $v0",fp);
 }
 
 void print_MIP_WRITE(MipsCodes p){
-     	fputs("move $a0, ",fp);
+    fputs("   move $a0, ",fp);
 	print_Operand_M(p->code->assign.left);
-	fputs("addi $sp, $sp, -4\n", fp);
-     	fputs("sw $ra, 0($sp)\n", fp);
-	fputs("jal write\n",fp);
-	fputs("lw $ra, 0($sp)\n",fp);
-	fputs("addi $sp, $sp, 4",fp);
+	fputs("   addi $sp, $sp, -4\n", fp);
+    fputs("   sw $ra, 0($sp)\n", fp);
+	fputs("   jal write\n",fp);
+	fputs("   lw $ra, 0($sp)\n",fp);
+	fputs("   addi $sp, $sp, 4",fp);
 }
 
 void print_MipsCodes(char* output){
@@ -248,6 +252,7 @@ void print_MipsCodes(char* output){
         printf_init();
 	MipsCodes p = Mips_head->next;assert(p->code!=NULL);
 	while(p!=NULL){
+		fprintf(fp, "   ");
 		switch(p->code->kind){
 			case MIP_LAB:
 				print_MIP_LAB(p);
@@ -278,8 +283,8 @@ void print_MipsCodes(char* output){
 				break;
 			case MIP_MFLO:
 				print_MIP_MFLO(p); 
-                                break; 
-                        case MIP_LW:
+                break; 
+            case MIP_LW:
 				print_MIP_LW(p);
 				break;
 			case MIP_SW:
@@ -312,6 +317,9 @@ void print_MipsCodes(char* output){
 			case MIP_BLE:
 				print_MIP_BLE(p);
 				break;
+			case MIP_FUNC:
+				print_MIP_FUNC(p);
+				break;
 			case MIP_READ:
 				print_MIP_READ(p);
 				break;
@@ -323,7 +331,7 @@ void print_MipsCodes(char* output){
 
 		}
 		//if(p->code->kind!=COND)
-		//	fputs("\n",fp);
+		fputs("\n",fp);
 		p=p->next;
 	}
 	fclose(fp);
@@ -409,16 +417,15 @@ void translate_MipsCodes(InterCodes IC_head){
 }
 int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
 	if(kind == 0){
-                int i;
+            int i;
         	for(i = 0; i < 8; i++){
         		if(regtable[i]->kind == NO_USE){
 			        regtable[i]->kind == REG_USE;
-                                return i;
-
+                                return i + 8;
 		        }
 	        }
                 reg_t ++;
-                return (reg_t % 8 + 8);
+                return ((reg_t % 8) + 8);
         }
         else if(kind == 1){
                 int i;
@@ -429,7 +436,7 @@ int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
                         }
                 }
                 reg_a ++;
-                return (reg_a % 4 + 4);
+                return ((reg_a % 4) + 4);
         }
         else if(kind == 2){
                 int i;
@@ -440,7 +447,7 @@ int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
                         }
                 }
                 reg_v++;
-                return (reg_v % 2 + 2);
+                return ((reg_v % 2) + 2);
         }
 }
 
@@ -497,7 +504,6 @@ void translate_MipsCode(InterCodes IC_codes){
 	InterCode IC_code = IC_codes->code;
 	//MipsCode temp = new_MipsCode();
 	Operand_M opm1 = NULL,opm2 = NULL,opm3 = NULL;
-	MipsCodes Mips_head = NULL;
 	int reg_no;
 	switch(IC_code->kind){
 		case ASSIGN:
@@ -995,7 +1001,7 @@ void translate_MipsCode(InterCodes IC_codes){
 		case RET:;
 			{MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_MOVE);
-                        reg_no = get_reg(2);
+            reg_no = get_reg(2);
 			opm1 = new_reg(reg_no);
 			temp->assign.left = opm1;
 			//return #k
@@ -1085,7 +1091,7 @@ void translate_MipsCode(InterCodes IC_codes){
 			{MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_FUNC);
 			opm1 = new_operand_M(MIP_FUNC_op,0);
-			strcmp(opm1->func,IC_code->onlyop.op->func);
+			strcpy(opm1->func,IC_code->onlyop.op->func);
 			temp->onlyop.op = opm1;
 			tem->code = temp;
 			MipsCodes_link(Mips_head,tem);}
@@ -1201,6 +1207,7 @@ void translate_MipsCode(InterCodes IC_codes){
 
 void cal_MipsCodes(char* output){
         Mips_head_init();
+        regtable_init();
         translate_MipsCodes(intercodes_head->next);
         print_MipsCodes(output);
 }
