@@ -1,11 +1,8 @@
 #include "mipscode.h"
 #include <string.h>
 #include <assert.h>
-<<<<<<< HEAD
 #include <stdio.h>
-=======
 #include "intercode.h"
->>>>>>> 4e86b57391e0c79b72784bfc3590cd165f736fb2
 
 #define REG_TABLE_SIZE 14
 FILE *fp;
