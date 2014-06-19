@@ -25,11 +25,7 @@ typedef struct MipsCode_
 {
 	enum { MIP_LAB, MIP_LI, MIP_LA, MIP_MOVE, MIP_ADDI, MIP_ADD, MIP_SUB, MIP_MUL, MIP_DIV, 
 			MIP_MFLO, MIP_LW, MIP_SW, MIP_J, MIP_JAL, MIP_JR, MIP_BEQ, MIP_BNE, MIP_BGT, MIP_BLT,
-<<<<<<< HEAD
 			MIP_BGE, MIP_BLE, MIP_FUNC, MIP_READ, MIP_WRITE} kind;
-=======
-			MIP_BGE, MIP_BLE, MIP_READ, MIP_WRITE} kind;
->>>>>>> a6b742b1087a3b6ba21ed1e0032fa97c7d9de7b9
 	union {
 		struct { Operand_M right, left; } assign;
 		struct { Operand_M result, op1, op2; } binop;
@@ -48,11 +44,7 @@ MipsCodes Mips_head;
 
 typedef struct RegTable_
 {
-	enum{NO_USE, REG_INT, REG_NAME} kind;
-	union{
-		int value;
-		char name[20];
-	}
+	enum{NO_USE, REG_USE} kind;
 }RegTable_;
 
 static char* reg[32] = {"$zero", "Sat", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7" "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$s8", "Sra"};
@@ -69,7 +61,12 @@ Operand_M new_label_M();
 Operand_M new_reg(no);
 Operand_M new_addr(int no, int offset);
 
+int get_reg(int kind);
+int get_reg_name(char* name,int kind);
 //function of print
+void regtable_init();
+
+void cal_MipsCodes(char* output);
 void print_MipsCodes(char* output);
 void print_Operand_M(Operand_M);
 
