@@ -1,6 +1,7 @@
 #include "mipscode.h"
 #include <string.h>
 #include <assert.h>
+#include "intercode.h"
 
 #define REG_TABLE_SIZE 8
 FILE *fp
@@ -357,7 +358,7 @@ void MipsCodes_link(MipsCodes prev,MipsCodes next){
 	next->prev = prev;
 }
 void Mips_head_init(){
-	MipsCodes_head = MipsCodes_init();
+	Mips_head = MipsCodes_init();
 	var_no = 1;
 }
 MipsCode new_MipsCode(int kind){//init a new interCode
@@ -374,7 +375,6 @@ MipsCode new_MipsCode(int kind){//init a new interCode
 Operand_M new_operand_M(int kind,int value){
 	Operand_M op = (Operand_M)malloc(sizeof(Operand_M_));
 	op->kind = kind;
-	op->is_min = 0;
 	if(kind == 0)//constant
 		op->value = value;
 	else if(kind == MIP_FUNC_op)
@@ -390,10 +390,10 @@ Operand_M new_reg(no){
 	return op;
 }
 Operand_M new_addr(int no, int offset){
-	Operands op = (Operand_M)malloc(sizeof(Operand_M_));
+	Operand_M op = (Operand_M)malloc(sizeof(Operand_M_));
 	op->kind = MIPS_OP_ADDR;
-	op->u.addr.reg_no = no;
-	op->u.addr.offset = offset;
+	op->addr.reg_no = no;
+	op->addr.offset = offset;
 	return op;
 }
 void translate_MipsCodes(InterCodes IC_head){

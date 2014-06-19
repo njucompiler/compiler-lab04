@@ -25,11 +25,7 @@ typedef struct MipsCode_
 {
 	enum { MIP_LAB, MIP_LI, MIP_LA, MIP_MOVE, MIP_ADDI, MIP_ADD, MIP_SUB, MIP_MUL, MIP_DIV, 
 			MIP_MFLO, MIP_LW, MIP_SW, MIP_J, MIP_JAL, MIP_JR, MIP_BEQ, MIP_BNE, MIP_BGT, MIP_BLT,
-<<<<<<< HEAD
 			MIP_BGE, MIP_BLE, MIP_FUNC, MIP_READ, MIP_WRITE} kind;
-=======
-			MIP_BGE, MIP_BLE, MIP_READ, MIP_WRITE} kind;
->>>>>>> a6b742b1087a3b6ba21ed1e0032fa97c7d9de7b9
 	union {
 		struct { Operand_M right, left; } assign;
 		struct { Operand_M result, op1, op2; } binop;
