@@ -485,7 +485,7 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         		return j+8;
         	}
         }
-    else if(op->kind == TEMP || op->kind == CONSTANT){
+    else if(op->kind == TEMP || op->kind == CONSTANT||op->kind == PARAM_op){
     	char name[20] = "t";
     	char num[4];
     	sprintf(num,"%d",op->var_no);
@@ -1010,6 +1010,12 @@ void translate_MipsCode(InterCodes IC_codes){
 				MipsCodes_link(Mips_head,tem);
 			}
 			//x:=y*z
+			if(IC_code->binop.op1->kind!=CONSTANT && IC_code->binop.op2->kind!=CONSTANT){
+				reg_no = get_reg(IC_code->binop.op1);
+				opm2 = new_reg(reg_no);
+				reg_no = get_reg(IC_code->binop.op2);
+				opm3 = new_reg(reg_no);
+			}
 			{MipsCodes tem1 = MipsCodes_init();
 			MipsCode temp1 = new_MipsCode(MIP_MUL);
 			temp1->binop.result = opm1;
