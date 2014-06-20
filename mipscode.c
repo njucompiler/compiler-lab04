@@ -1247,7 +1247,7 @@ void translate_MipsCode(InterCodes IC_codes){
 			MipsCodes tem3 = MipsCodes_init();
 			MipsCode temp3 = new_MipsCode(MIP_JAL);
 			temp3->onlyop.op = new_operand_M(MIP_FUNC_op,0);
-			strcpy(temp3->onlyop.op->func,IC_code->binop.op2->func);
+			strcpy(temp3->onlyop.op->func,IC_code->assign.right->func);
 			tem3->code = temp3;
                         MipsCodes_link(Mips_head,tem3);
 			
