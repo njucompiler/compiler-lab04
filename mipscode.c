@@ -46,7 +46,7 @@ void print_Operand_M(Operand_M p){
                       break;
                       }
                 case MIP_FUNC_op:{
-                      fprintf(fp, "%s:" ,p->func);
+                      fprintf(fp, "%s" ,p->func);
                       break;
                       }
                 case MIP_ADDR_op:{
@@ -241,6 +241,7 @@ void print_MIP_BLE(MipsCodes p){
 
 void print_MIP_FUNC(MipsCodes p){
 	print_Operand_M(p->code->onlyop.op);
+        fputs(":");
 }
 
 void print_MIP_READ(MipsCodes p){
