@@ -50,7 +50,7 @@ void print_Operand_M(Operand_M p){
                       break;
                       }
                 case MIP_ADDR_op:{
-                      fprintf(fp, "%d(%d)", p->addr.addr_reg_no, p->addr.offset); 
+                      fprintf(fp, "%d(%s)", p->addr.offset,reg[p->addr.addr_reg_no]); 
                       break;
                       }
                 case MIP_REG:{
