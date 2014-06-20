@@ -1245,7 +1245,7 @@ void optimize(){
 		return;
 	}
 	while(temp->next != NULL){
-		if((temp->code->kind == 0 || temp->code->kind == 1 || temp->code->kind == 2 || temp->code->kind == 3 || temp->code->kind == 4)&& (temp->next->code->kind == 0)){
+		if(temp->code->kind == 0 && temp->next->code->kind == 0){
 			Operand left = get_left(temp);
 			if(left == temp->next->code->assign.right){
 				if(temp->code->kind == 0)
@@ -1258,9 +1258,69 @@ void optimize(){
 					temp->next->next->prev = temp;
 				}
 				temp->next = codes->next;
-				free(codes);
+                                temp->next->prev = temp;
+			}	
+                }
+                else if(temp->code->kind == READ){
+                        temp->code->onlyop.op = temp->next->code->assign.left;
+			
+                        InterCodes codes = temp->next;
+			if(temp->next->next != NULL){
+				temp->next->next->prev = temp;
 			}
-		}
+			temp->next = codes->next;
+                        temp->next->prev = temp;
+                }
+                else if(temp->code->kind == ADD || temp->code->kind == SUB ||temp->code->kind == MUL || temp->code->kind == DIVI){
+                         InterCodes temp_h = temp;
+                         InterCodes temp_t = temp;
+                         int num = 0;
+                         while(num < 2 && temp_h->prev != NULL && temp_h->prev != intercodes_head){
+                                 temp_h = temp_h->prev;
+                                 temp_t = temp_h->next;
+                                 if(temp_h->code->kind == ASSIGN && temp_h->code->assign.left == temp->code->binop.op1){
+                                        temp->code->binop.op1 = temp_h->code->assign.right;
+                                        if(temp_h->prev != NULL){
+                                                temp_h->prev->next = temp_t;
+                                                temp_t->prev = temp_h->prev;
+                                        }
+                                 }
+                                 else if(temp_h->code->kind == ASSIGN && temp_h->code->assign.left == temp->code->binop.op2){
+                                        temp->code->binop.op2 = temp_h->code->assign.right;
+                                        if(temp_h->prev != NULL){
+                                                temp_h->prev->next = temp_t;
+                                                temp_t->prev = temp_h->prev;
+                                        }
+                                 }
+                         num ++;
+                         }
+                }
+                else if(temp->code->kind == COND){
+                         InterCodes temp_h = temp;
+                         InterCodes temp_t = temp;
+                         int num = 0;
+                         while(num < 2 && temp_h->prev != NULL && temp_h->prev != intercodes_head){
+                                 temp_h = temp_h->prev;
+                                 temp_t = temp_h->next;
+                                 if(temp_h->code->kind == ASSIGN && temp_h->code->assign.left == temp->code->cond.op1){
+                                        temp->code->cond.op1 = temp_h->code->assign.right;
+                                        if(temp_h->prev != NULL){
+                                                temp_h->prev->next = temp_t;
+                                                temp_t->prev = temp_h->prev;
+                                        }
+                                 }
+                                 else if(temp_h->code->kind == ASSIGN && temp_h->code->assign.left == temp->code->cond.op2){
+                                        temp->code->cond.op2 = temp_h->code->assign.right;
+                                        if(temp_h->prev != NULL){
+                                                temp_h->prev->next = temp_t;
+                                                temp_t->prev = temp_h->prev;
+                                        }
+                                 }
+                         num ++;
+                         }
+                         
+                }
+                temp->next->prev = temp;
 		temp = temp->next;
 	}
 }
@@ -1268,7 +1328,7 @@ void optimize(){
 void printfile(node* p){
 	head_init();
 	intercode_aly(p);
-	//optimize();
+	optimize();
 }
 
 int getSize(FieldList p){
