@@ -485,7 +485,7 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         		return j+8;
         	}
         }
-    else if(op->kind == TEMP){
+    else if(op->kind == TEMP || op->kind == CONSTANT){
     	char name[20] = "t";
     	char num[4];
     	sprintf(num,"%d",op->var_no);
