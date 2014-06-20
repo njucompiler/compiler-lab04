@@ -241,7 +241,7 @@ void print_MIP_BLE(MipsCodes p){
 
 void print_MIP_FUNC(MipsCodes p){
 	print_Operand_M(p->code->onlyop.op);
-        fputs(":");
+        fputs(":",fp);
 }
 
 void print_MIP_READ(MipsCodes p){
@@ -1132,31 +1132,9 @@ void translate_MipsCode(InterCodes IC_codes){
 		case ADDR:
 			break;
 		case COND:;
-			/*if(IC_code->cond.op1->kind == CONSTANT){		// temp:=*y
-				reg_no = get_reg();
-				opm2 = new_addr(reg_no,0);
-				reg_no = get_reg();
-				Operand_M opm_tem = new_reg(reg_no);
-				MipsCodes tem = MipsCodes_init();
-				MipsCode temp = new_MipsCode(MIP_LW);
-				temp->assign.left = opm_tem;
-				temp->assign.right = opm2;
-				tem->code = temp;
-				MipsCodes_link(Mips_head,tem);
-			}
-			if(IC_code->cond.op2->kind == CONSTANT){		// temp:=*x
-				reg_no = get_reg();
-				opm3 = new_addr(reg_no,0);
-				reg_no = get_reg();
-				Operand_M opm_tem = new_reg(reg_no);
-				MipsCodes tem = MipsCodes_init();
-				MipsCode temp = new_MipsCode(MIP_LW);
-				temp->assign.left = opm_tem;
-				temp->assign.right = opm3;
-				tem->code = temp;
-				MipsCodes_link(Mips_head,tem);
-			}*/
-			{MipsCodes tem = MipsCodes_init();
+
+			{
+			MipsCodes tem = MipsCodes_init();
 			MipsCode temp = NULL;
 			//if x==y GOTO z
 			if(strcmp(IC_code->cond.op->op,"==") == 0){
@@ -1182,6 +1160,51 @@ void translate_MipsCode(InterCodes IC_codes){
 			if(strcmp(IC_code->cond.op->op,"<=") == 0){
 				temp = new_MipsCode(MIP_BLE);
 			}
+			if(IC_code->cond.op1->kind == CONSTANT){		// #k == y
+				reg_no = get_reg(IC_code->cond.op1);
+				opm1 = new_reg(reg_no);
+				//reg_no = get_reg();
+				//Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem1 = MipsCodes_init();
+				MipsCode temp1 = new_MipsCode(MIP_LI);
+				temp1->assign.left = opm1;
+				temp1->assign.right = new_operand_M(0,IC_code->cond.op1->value);
+				tem->code = temp1;
+				MipsCodes_link(Mips_head,tem1);
+				//reg_no = get_reg(IC_code->cond.op1);
+				//Operand_M opm1 = new_reg(reg_no);
+				reg_no = get_reg(IC_code->cond.op2);
+				Operand_M opm2 = new_reg(reg_no);
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				opm3 = new_operand_M(MIP_LABEL,IC_codes->next->code->onlyop.op->label_no);
+				temp->binop.op2 = opm3;
+				tem->code = temp;
+				MipsCodes_link(Mips_head,tem);
+			}
+			else if(IC_code->cond.op2->kind == CONSTANT){		// x == #k
+				reg_no = get_reg(IC_code->cond.op2);
+				opm2 = new_reg(reg_no);
+				//reg_no = get_reg();
+				//Operand_M opm_tem = new_reg(reg_no);
+				MipsCodes tem1 = MipsCodes_init();
+				MipsCode temp1 = new_MipsCode(MIP_LI);
+				temp1->assign.left = opm2;
+				temp1->assign.right = new_operand_M(0,IC_code->cond.op2->value);
+				tem1->code = temp1;
+				MipsCodes_link(Mips_head,tem1);
+				reg_no = get_reg(IC_code->cond.op1);
+				Operand_M opm1 = new_reg(reg_no);
+				//reg_no = get_reg(IC_code->cond.op2);
+				//Operand_M opm2 = new_reg(reg_no);
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				opm3 = new_operand_M(MIP_LABEL,IC_codes->next->code->onlyop.op->label_no);
+				temp->binop.op2 = opm3;
+				tem->code = temp;
+				MipsCodes_link(Mips_head,tem);
+			}
+			else{
 			reg_no = get_reg(IC_code->cond.op1);
 			Operand_M opm1 = new_reg(reg_no);
 			reg_no = get_reg(IC_code->cond.op2);
@@ -1191,7 +1214,7 @@ void translate_MipsCode(InterCodes IC_codes){
 			opm3 = new_operand_M(MIP_LABEL,IC_codes->next->code->onlyop.op->label_no);
 			temp->binop.op2 = opm3;
 			tem->code = temp;
-			MipsCodes_link(Mips_head,tem);}
+			MipsCodes_link(Mips_head,tem);}}
 			break;
 		case FUNC_I:;
 			{MipsCodes tem = MipsCodes_init();
