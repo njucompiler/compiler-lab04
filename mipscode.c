@@ -661,11 +661,11 @@ void translate_MipsCode(InterCodes IC_codes){
 				opm1 = new_reg(reg_no);
 				reg_no = get_reg(IC_code->binop.op2);
 				opm3 = new_reg(reg_no);
-				opm2 = new_operand_M(0,IC_code->binop.op2->value);
+				opm2 = new_operand_M(0,IC_code->binop.op1->value);
 				MipsCode temp = new_MipsCode(MIP_ADDI);
 				temp->binop.result = opm1;
-				temp->binop.op1 = opm2;
-				temp->binop.op2 = opm3;
+				temp->binop.op1 = opm3;
+				temp->binop.op2 = opm2;
 				MipsCodes tem = MipsCodes_init();
 				tem->code = temp;
 				MipsCodes_link(Mips_head,tem);
