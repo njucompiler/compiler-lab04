@@ -1309,5 +1309,6 @@ void cal_MipsCodes(char* output){
         regtable_init();
         translate_MipsCodes(intercodes_head->next);
         print_MipsCodes(output);
+        //sss
 }
 
