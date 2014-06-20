@@ -9,6 +9,7 @@ FILE *fp;
 int arg_num = 0;
 int reg_t, reg_a, reg_v;
 RegTable regtable[REG_TABLE_SIZE];
+int param_num = 0;
 
 void printf_init(){
         fprintf(fp, ".data\n");
@@ -461,15 +462,20 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         		return j+8;
         	}
 	}*/
-	if(op->kind == VARIABLE || op->kind == CONSTANT || op->kind == PARAM_op){
+	if(op->kind == VARIABLE || op->kind == CONSTANT ){
         	int i,j = 0;
-        	for(i = 0; i < 18; i++){
+        	for(i = 0; i < 22; i++){
 	        	if(regtable[i]->kind == REG_USE){
 		        	if(strcmp(regtable[i]->name ,op->name) == 0){
-			        	return i+8;
-			        }
+					if(i < 18)
+			        		return i+8;
+					else
+						return i-14;			        
+				}
 		        }
-        		else if(regtable[i]->kind == NO_USE){
+		}
+		for(i = 0; i < 18; i++){
+        		if(regtable[i]->kind == NO_USE){
 	        		j = i;
 	        	}
 	        }
@@ -486,19 +492,52 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         		return j+8;
         	}
         }
-    else if(op->kind == TEMP || op->kind == CONSTANT||op->kind == PARAM_op){
+	else if(op->kind == PARAM_op){
+		int i,j = 0;
+        	for(i = 18; i < 22; i++){
+	        	if(regtable[i]->kind == REG_USE){
+		        	if(strcmp(regtable[i]->name ,op->param) == 0){
+			        	return i-14;
+			        }
+		        }
+		}
+		for(i = 18; i < 22; i++){
+        		if(regtable[i]->kind == NO_USE){
+	        		j = i;
+				break;
+	        	}
+	        }
+        	if(j == 0){
+	        	reg_a ++;
+	        	regtable[reg_a % 4 + 18]->kind = REG_USE;
+	        	memset(regtable[reg_t % 4 +18]->name,0,20);
+		        strcpy(regtable[reg_t % 4 +18]->name, op->param);
+        		return ((reg_t % 4) + 4); 
+        	}
+        	else{
+        		regtable[j]->kind = REG_USE;
+        		strcpy(regtable[j]->name, op->param);
+        		return j-14;
+        	}
+	}
+    else if(op->kind == TEMP){
     	char name[20] = "t";
     	char num[4];
     	sprintf(num,"%d",op->var_no);
     	strcat(name,num);
     	int i,j = 0;
-        	for(i = 0; i < 18; i++){
+        	for(i = 0; i < 22; i++){
 	        	if(regtable[i]->kind == REG_USE){
 		        	if(strcmp(regtable[i]->name ,name) == 0){
-			        	return i+8;
-			        }
+					if(i < 18)
+			        		return i+8;
+					else
+						return i-14;			        
+				}
 		        }
-        		else if(regtable[i]->kind == NO_USE){
+		}
+		for(i = 0; i < 18; i++){
+        		if(regtable[i]->kind == NO_USE){
 	        		j = i;
 	        	}
 	        }
@@ -515,31 +554,33 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         		return j+8;
         	}
     }
+	
 }
 
-int get_other_reg(int kind){
-		if(kind == 1){
-                int i;
-                for(i = 8; i < 12; i++){
-                        if(regtable[i]->kind == NO_USE){
-                                regtable[i]->kind = REG_USE;
-                                return i-4; 
-                        }
-                }
-                reg_a ++;
-                return ((reg_a % 4) + 4);
-        }
-        else if(kind == 2){
-                int i;
-                for(i = 12; i < 14; i++){
-                        if(regtable[i]->kind == NO_USE){
-                                regtable[i]->kind = REG_USE;
-                                return i-10;
-                        }
-                }
-                reg_v++;
-                return ((reg_v % 2) + 2);
-        }
+int get_other_reg(Operand op){
+		int i,j = 0;
+        	for(i = 18; i < 22; i++){
+	        	if(regtable[i]->kind == REG_USE){
+		        	if(strcmp(regtable[i]->name ,op->name) == 0){
+			        	return i-14;
+			        }
+		        }
+        		else if(regtable[i]->kind == NO_USE){
+	        		j = i;
+	        	}
+	        }
+        	if(j == 0){
+	        	reg_a ++;
+	        	regtable[reg_a % 4 + 18]->kind = REG_USE;
+	        	memset(regtable[reg_t % 4 +18]->name,0,20);
+		        strcpy(regtable[reg_t % 4 +18]->name, op->name);
+        		return ((reg_t % 4) + 4); 
+        	}
+        	else{
+        		regtable[j]->kind = REG_USE;
+        		strcpy(regtable[j]->name, op->name);
+        		return j-14;
+        	}
 }
 
 /*int get_reg(int kind){//0 $t0 ,1 $a0 ,2 $v0
@@ -813,8 +854,8 @@ void translate_MipsCode(InterCodes IC_codes){
 				opm1 = new_reg(reg_no);
 				reg_no = get_reg(IC_code->binop.op1);
 				opm2 = new_reg(reg_no);
-				opm3 = new_operand_M(0,IC_code->binop.op1->value);
-				MipsCode temp = new_MipsCode(MIP_ADDI);
+				opm3 = new_operand_M(0,IC_code->binop.op2->value);
+				MipsCode temp = new_MipsCode(MIP_SUB);
 				temp->binop.result = opm1;
 				temp->binop.op1 = opm2;
 				temp->binop.op2 = opm3;	
@@ -828,8 +869,8 @@ void translate_MipsCode(InterCodes IC_codes){
 				opm1 = new_reg(reg_no);
 				reg_no = get_reg(IC_code->binop.op2);
 				opm3 = new_reg(reg_no);
-				opm2 = new_operand_M(0,IC_code->binop.op2->value);
-				MipsCode temp = new_MipsCode(MIP_ADDI);
+				opm2 = new_operand_M(0,IC_code->binop.op1->value);
+				MipsCode temp = new_MipsCode(MIP_SUB);
 				temp->binop.result = opm1;
 				temp->binop.op1 = opm2;
 				temp->binop.op2 = opm3;
@@ -954,6 +995,22 @@ void translate_MipsCode(InterCodes IC_codes){
 				MipsCodes tem1 = MipsCodes_init();
 				tem1->code = temp1;
 				MipsCodes_link(Mips_head,tem1);
+			}
+//x:=y-z
+			if(IC_code->binop.op1->kind != ADDR_op && IC_code->binop.op1->kind != CONSTANT&&IC_code->binop.op2->kind != ADDR_op && IC_code->binop.op2->kind != CONSTANT){
+				reg_no = get_reg(IC_code->binop.result);
+				opm1 = new_reg(reg_no);
+				reg_no = get_reg(IC_code->binop.op1);
+				opm2 = new_reg(reg_no);
+				reg_no = get_reg(IC_code->binop.op2);
+				opm3 = new_reg(reg_no);
+				MipsCode temp = new_MipsCode(MIP_SUB);
+				temp->binop.result = opm1;
+				temp->binop.op1 = opm2;
+				temp->binop.op2 = opm3;	
+				MipsCodes tem = MipsCodes_init();
+				tem->code = temp;
+				MipsCodes_link(Mips_head,tem);	
 			}
 			//x:=#k+#k
 			break;
@@ -1246,7 +1303,7 @@ void translate_MipsCode(InterCodes IC_codes){
                         MipsCodes_link(Mips_head,tem);}
 			break;
 		case CALL:;
-			{MipsCodes tem = MipsCodes_init();
+			/*{MipsCodes tem = MipsCodes_init();
 			MipsCode temp = new_MipsCode(MIP_ADDI);
 			opm1 = new_reg(29);
 			opm2 = new_reg(29);
@@ -1272,8 +1329,8 @@ void translate_MipsCode(InterCodes IC_codes){
                         temp2->assign.right = new_addr(29,4*i);
                         //temp1->binop.op2 = new_Operand_M(4*i);
 			tem2->code = temp2;
-			MipsCodes_link(Mips_head,tem2);
-
+			MipsCodes_link(Mips_head,tem2);*/
+			int i;
 			MipsCodes tem3 = MipsCodes_init();
 			MipsCode temp3 = new_MipsCode(MIP_JAL);
 			temp3->onlyop.op = new_operand_M(MIP_FUNC_op,0);
@@ -1310,14 +1367,57 @@ void translate_MipsCode(InterCodes IC_codes){
                         temp5->binop.op2 = opm3;
                         tem5->code = temp5;
                         MipsCodes_link(Mips_head,tem5);
-
-			arg_num = 0;}
+			MipsCodes tem6 = MipsCodes_init();
+			MipsCode temp6 = new_MipsCode(MIP_MOVE);
+			tem6->code = temp6;
+			reg_no = get_reg(IC_code->assign.left);
+			temp6->assign.left = new_reg(reg_no);
+			temp6->assign.right = new_reg(2);
+			MipsCodes_link(Mips_head,tem6);
+			arg_num = 0;
 			break;
 		case ARG:
 			arg_num++;
+			if(IC_codes->next->code->kind == CALL){
+			{MipsCodes tem = MipsCodes_init();
+			MipsCode temp = new_MipsCode(MIP_ADDI);
+			opm1 = new_reg(29);
+			opm2 = new_reg(29);
+			opm3 = new_operand_M(0,0-4*(arg_num+1));
+			temp->binop.result = opm1;
+			temp->binop.op1 = opm2;
+			temp->binop.op2 = opm3;
+			tem->code = temp;
+			MipsCodes_link(Mips_head,tem);
+			int i;
+			for(i = 0;i<arg_num;i++){
+				MipsCodes tem1 = MipsCodes_init();
+				MipsCode temp1 = new_MipsCode(MIP_SW);
+				temp1->assign.left = new_reg(i+4);
+				temp1->assign.right = new_addr(29,4*i);
+				//temp1->binop.op2 = new_Operand_M(4*i);
+				tem1->code = temp1;
+				MipsCodes_link(Mips_head,tem1);
+			}
+                        MipsCodes tem2 = MipsCodes_init();
+                        MipsCode temp2 = new_MipsCode(MIP_SW);
+                        temp2->assign.left = new_reg(31);
+                        temp2->assign.right = new_addr(29,4*i);
+                        //temp1->binop.op2 = new_Operand_M(4*i);
+			tem2->code = temp2;
+			MipsCodes_link(Mips_head,tem2);}
+
+			MipsCodes tem = MipsCodes_init();
+			MipsCode temp = new_MipsCode(MIP_MOVE);
+			reg_no = get_reg(IC_code->onlyop.op);
+			opm2 = new_reg(reg_no);
+			temp->assign.left = new_reg(arg_num+3);
+			temp->assign.right = opm2;
+			tem->code = temp;
+			MipsCodes_link(Mips_head,tem);
 			break;
 		case PARAM_I:;
-                        {MipsCodes tem = MipsCodes_init();
+                        {/*MipsCodes tem = MipsCodes_init();
                         MipsCode temp = new_MipsCode(MIP_LI);
                         reg_no = get_reg(IC_code->onlyop.op);
 			opm1 = new_reg(reg_no);
@@ -1325,7 +1425,10 @@ void translate_MipsCode(InterCodes IC_codes){
                         temp->assign.left = opm1;
 			temp->assign.right = opm2;
                         tem->code = temp;
-                        MipsCodes_link(Mips_head,tem);}
+                        MipsCodes_link(Mips_head,tem);*/
+			reg_no = get_reg(IC_code->onlyop.op);
+			param_num++;		
+			}
 			break;
 		default:
 			printf("Oh,no! FORGET!\n");
@@ -1333,7 +1436,7 @@ void translate_MipsCode(InterCodes IC_codes){
 	}
 	//return temp;
 }
-
+}
 void cal_MipsCodes(char* output){
         Mips_head_init();
         regtable_init();

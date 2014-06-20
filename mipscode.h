@@ -63,7 +63,7 @@ Operand_M new_label_M();
 Operand_M new_reg(int no);
 Operand_M new_addr(int no, int offset);
 
-int get_other_reg(int kind);//1 $a,2 $v
+int get_other_reg(Operand op);//1 $a
 int get_reg(Operand op);
 //int get_reg_name(char* name,int kind);
 //function of print
