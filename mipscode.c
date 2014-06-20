@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "intercode.h"
 
-#define REG_TABLE_SIZE 14
+#define REG_TABLE_SIZE 24
 FILE *fp;
 int arg_num = 0;
 int reg_t, reg_a, reg_v;
@@ -460,9 +460,9 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
         		return j+8;
         	}
 	}*/
-	if(op->kind == VARIABLE){
+	if(op->kind == VARIABLE || op->kind == CONSTANT || op->kind == PARAM_op){
         	int i,j = 0;
-        	for(i = 0; i < 8; i++){
+        	for(i = 0; i < 18; i++){
 	        	if(regtable[i]->kind == REG_USE){
 		        	if(strcmp(regtable[i]->name ,op->name) == 0){
 			        	return i+8;
@@ -491,7 +491,7 @@ int get_reg(Operand op){//0 $t0 ,1 $a0 ,2 $v0
     	sprintf(num,"%d",op->var_no);
     	strcat(name,num);
     	int i,j = 0;
-        	for(i = 0; i < 8; i++){
+        	for(i = 0; i < 18; i++){
 	        	if(regtable[i]->kind == REG_USE){
 		        	if(strcmp(regtable[i]->name ,name) == 0){
 			        	return i+8;
