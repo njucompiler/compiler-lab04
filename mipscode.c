@@ -148,17 +148,17 @@ void print_MIP_MFLO(MipsCodes p){
 void print_MIP_LW(MipsCodes p){
 	fprintf(fp, "   ");
     fputs("lw ",fp);
-    print_Operand_M(p->code->assign.right);
+    print_Operand_M(p->code->assign.left);
     fputs(", ",fp);
-	print_Operand_M(p->code->assign.left);
+	print_Operand_M(p->code->assign.right);
 }
 
 void print_MIP_SW(MipsCodes p){
 	fprintf(fp, "   ");
 	fputs("sw ",fp);
-	print_Operand_M(p->code->assign.right);
-	fputs(", ",fp);
 	print_Operand_M(p->code->assign.left);
+	fputs(", ",fp);
+	print_Operand_M(p->code->assign.right);
 }
 
 void print_MIP_J(MipsCodes p){
